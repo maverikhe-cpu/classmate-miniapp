@@ -1,0 +1,30 @@
+<view class="activity-card card" bindtap="onTap">
+  <view class="card-header">
+    <view class="card-title-row">
+      <text class="card-title">{{activity.title}}</text>
+      <view class="tag {{statusTagClass}}">{{statusText}}</view>
+    </view>
+    <view class="card-meta">
+      <text class="meta-item">{{formattedDate}}</text>
+      <text class="meta-dot">·</text>
+      <text class="meta-item">{{formattedTime}}</text>
+    </view>
+    <view class="card-meta" wx:if="{{activity.city}}">
+      <text class="meta-icon">🌍</text>
+      <text class="meta-item">{{activity.country}} · {{activity.city}}</text>
+    </view>
+    <view class="card-meta" wx:if="{{activity.location}}">
+      <text class="meta-icon">📍</text>
+      <text class="meta-item">{{activity.location}}</text>
+    </view>
+  </view>
+
+  <view class="card-footer">
+    <view class="member-info">
+      <text class="member-icon">👥</text>
+      <text class="member-count-text">{{activity.members.length}}{{activity.maxMembers ? '/' + activity.maxMembers : ''}}人参加</text>
+    </view>
+    <view wx:if="{{canQuickSignup}}" class="signup-badge">立即报名</view>
+    <text wx:else class="detail-hint">查看详情 ›</text>
+  </view>
+</view>

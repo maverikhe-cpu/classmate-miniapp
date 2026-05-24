@@ -1,0 +1,15 @@
+{
+  "name": "classmate-miniapp-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for classmate miniapp",
+  "scripts": {
+    "test": "node run.js",
+    "test:onboarding": "node run.js onboarding",
+    "test:activity": "node run.js activity",
+    "test:profile": "node run.js profile",
+    "test:contacts": "node run.js contacts"
+  },
+  "dependencies": {
+    "miniprogram-automator": "^0.12.1"
+  }
+}

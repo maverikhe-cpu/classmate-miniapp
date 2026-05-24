@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "calendar-picker": "/components/calendar-picker/calendar-picker"
+  },
+  "navigationBarTitleText": "创建活动"
+}

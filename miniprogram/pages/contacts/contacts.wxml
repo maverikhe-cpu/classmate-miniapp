@@ -1,0 +1,192 @@
+<view class="page">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索同学..."
+        value="{{keyword}}"
+        bindinput="onSearch"
+        confirm-type="search"
+      />
+    </view>
+  </view>
+
+  <!-- 城市统计卡片横滑 -->
+  <scroll-view class="city-cards" scroll-x enable-flex>
+    <view
+      class="city-card {{selectedGroup === 0 && !selectedCity ? 'city-card-active' : ''}}"
+      bindtap="selectGroup"
+      data-group="{{0}}"
+    >
+      <text class="city-card-count">{{total}}</text>
+      <text class="city-card-name">全部</text>
+    </view>
+    <view
+      class="city-card {{selectedGroup === 1 ? 'city-card-active' : ''}}"
+      bindtap="selectGroup"
+      data-group="{{1}}"
+    >
+      <text class="city-card-count">{{groupCounts[1] || 0}}</text>
+      <text class="city-card-name">1班</text>
+    </view>
+    <view
+      class="city-card {{selectedGroup === 2 ? 'city-card-active' : ''}}"
+      bindtap="selectGroup"
+      data-group="{{2}}"
+    >
+      <text class="city-card-count">{{groupCounts[2] || 0}}</text>
+      <text class="city-card-name">2班</text>
+    </view>
+    <view
+      class="city-card {{selectedGroup === 3 ? 'city-card-active' : ''}}"
+      bindtap="selectGroup"
+      data-group="{{3}}"
+    >
+      <text class="city-card-count">{{groupCounts[3] || 0}}</text>
+      <text class="city-card-name">3班</text>
+    </view>
+    <view
+      class="city-card {{selectedGroup === 4 ? 'city-card-active' : ''}}"
+      bindtap="selectGroup"
+      data-group="{{4}}"
+    >
+      <text class="city-card-count">{{groupCounts[4] || 0}}</text>
+      <text class="city-card-name">4班</text>
+    </view>
+    <view
+      class="city-card {{selectedCity === item.city ? 'city-card-active' : ''}}"
+      wx:for="{{cityDistribution}}"
+      wx:key="city"
+      bindtap="selectCity"
+      data-city="{{item.city}}"
+      data-country="{{item.country}}"
+    >
+      <text class="city-card-count">{{item.count}}</text>
+      <text class="city-card-name">{{item.city}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 地图区域 -->
+  <view class="map-wrap" wx:if="{{showMap}}">
+    <map
+      id="contactsMap"
+      class="contacts-map"
+      latitude="{{mapCenter.lat}}"
+      longitude="{{mapCenter.lng}}"
+      scale="{{mapScale}}"
+      markers="{{markers}}"
+      bindmarkertap="onMarkerTap"
+      show-location
+      enable-zoom
+      enable-scroll
+    ></map>
+    <view class="map-legend">
+      <text class="legend-item">共 {{total}} 位同学 · {{cityDistribution.length}} 个城市</text>
+    </view>
+  </view>
+
+  <!-- 底部通讯录抽屉 -->
+  <view
+    class="drawer {{drawerExpanded ? 'drawer-expanded' : ''}}"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+  >
+    <view class="drawer-handle">
+      <view class="drawer-bar"></view>
+      <view class="drawer-title-row">
+        <text class="drawer-title">{{selectedCity ? selectedCity + ' (' + filteredUsers.length + '人)' : '全部同学 (' + total + '人)'}}</text>
+        <view class="sort-toggle" bindtap="toggleGroupMode">
+          <text class="sort-toggle-text">{{groupMode ? '按地区' : '按班级'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <scroll-view class="drawer-content" scroll-y>
+      <!-- 按城市分组 -->
+      <block wx:for="{{groupedUsers}}" wx:key="country">
+        <view class="group-header">
+          <text class="group-country">{{item.country}}</text>
+          <text class="group-count">{{item.users.length}}人</text>
+        </view>
+        <view class="user-list">
+          <view
+            class="user-item"
+            wx:for="{{item.users}}"
+            wx:for-item="user"
+            wx:key="_openid"
+            bindtap="onUserTap"
+            data-user="{{user}}"
+          >
+            <image
+              class="user-avatar"
+              src="{{user.avatarUrl || '/images/default-avatar.png'}}"
+              mode="aspectFill"
+            />
+            <view class="user-info">
+              <view class="user-name-row">
+                <text class="user-name">{{user.nickName || '同学'}}</text>
+                <text class="user-student-id" wx:if="{{user.studentId}}">{{user.studentId}}</text>
+              </view>
+              <text class="user-city" wx:if="{{user.city}}">{{user.city}}</text>
+            </view>
+            <text class="user-bio" wx:if="{{user.bio}}">{{user.bio}}</text>
+          </view>
+        </view>
+      </block>
+
+      <view class="empty-state" wx:if="{{groupedUsers.length === 0}}">
+        <text class="empty-icon">👥</text>
+        <text class="empty-text">{{keyword ? '没找到该同学' : '暂无同学信息'}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 同学详情弹窗 -->
+  <view class="user-modal-mask" wx:if="{{showUserModal}}" bindtap="closeUserModal">
+    <view class="user-modal" catchtap="">
+      <image
+        class="modal-avatar"
+        src="{{selectedUser.avatarUrl || '/images/default-avatar.png'}}"
+        mode="aspectFill"
+      />
+      <text class="modal-name">{{selectedUser.nickName || '同学'}}</text>
+      <text class="modal-student-id" wx:if="{{selectedUser.studentId}}">
+        {{selectedUser.studentId}} · {{selectedUser.group}}班
+      </text>
+      <text class="modal-location" wx:if="{{selectedUser.city}}">
+        🌍 {{selectedUser.country}} · {{selectedUser.city}}
+      </text>
+      <text class="modal-bio" wx:if="{{selectedUser.bio}}">{{selectedUser.bio}}</text>
+      <view class="modal-actions">
+        <block wx:if="{{selectedUser.wechat}}">
+          <view class="contact-row" bindtap="copyWechat">
+            <text class="contact-label">微信</text>
+            <text class="contact-value">{{selectedUser.wechat}}</text>
+            <text class="contact-copy">复制</text>
+          </view>
+        </block>
+        <block wx:if="{{selectedUser.email}}">
+          <view class="contact-row" bindtap="copyEmail">
+            <text class="contact-label">邮箱</text>
+            <text class="contact-value">{{selectedUser.email}}</text>
+            <text class="contact-copy">复制</text>
+          </view>
+        </block>
+        <block wx:if="{{selectedUser.phone}}">
+          <view class="contact-row" bindtap="copyPhone">
+            <text class="contact-label">电话</text>
+            <text class="contact-value">{{selectedUser.phone}}</text>
+            <text class="contact-copy">复制</text>
+          </view>
+        </block>
+        <view wx:if="{{!selectedUser.wechat && !selectedUser.email && !selectedUser.phone}}" class="no-contact">
+          <text class="no-contact-text">暂无联系方式</text>
+        </view>
+        <button class="add-contact-btn" bindtap="addToPhoneContact">添加到手机通讯录</button>
+      </view>
+    </view>
+  </view>
+</view>

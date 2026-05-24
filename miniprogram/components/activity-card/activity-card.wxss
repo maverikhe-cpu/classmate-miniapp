@@ -1,0 +1,88 @@
+.activity-card {
+  padding: 28rpx;
+}
+
+.card-header {
+  margin-bottom: 20rpx;
+}
+
+.card-title-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1F2937;
+  flex: 1;
+  margin-right: 16rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+
+.meta-icon {
+  font-size: 24rpx;
+  margin-right: 6rpx;
+}
+
+.meta-item {
+  font-size: 24rpx;
+  color: #6B7280;
+}
+
+.meta-dot {
+  margin: 0 8rpx;
+  color: #D1D5DB;
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F3F4F6;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.member-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.member-count-text {
+  font-size: 24rpx;
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+.detail-hint {
+  font-size: 24rpx;
+  color: #9CA3AF;
+}
+
+.signup-badge {
+  font-size: 24rpx;
+  color: #ffffff;
+  background-color: #4F46E5;
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  font-weight: 500;
+}

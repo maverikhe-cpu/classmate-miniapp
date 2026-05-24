@@ -1,0 +1,28 @@
+<view class="calendar">
+  <view class="cal-header">
+    <view class="cal-nav" bindtap="prevMonth">
+      <text class="cal-arrow">‹</text>
+    </view>
+    <text class="cal-title">{{displayMonth}}</text>
+    <view class="cal-nav" bindtap="nextMonth">
+      <text class="cal-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="cal-weekdays">
+    <text class="cal-weekday" wx:for="{{weekDays}}" wx:key="*this">{{item}}</text>
+  </view>
+
+  <view class="cal-grid">
+    <view
+      class="cal-day {{item.disabled ? 'day-disabled' : ''}} {{item.isToday ? 'day-today' : ''}} {{item.isSelected ? 'day-selected' : ''}}"
+      wx:for="{{days}}"
+      wx:key="day"
+      bindtap="onSelectDate"
+      data-date="{{item.dateStr}}"
+      data-disabled="{{item.disabled}}"
+    >
+      <text wx:if="{{item.day}}" class="day-text">{{item.day}}</text>
+    </view>
+  </view>
+</view>

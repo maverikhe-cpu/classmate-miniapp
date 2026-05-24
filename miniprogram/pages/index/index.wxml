@@ -1,0 +1,93 @@
+<view class="page">
+  <!-- 顶部标签页 -->
+  <view class="tabs">
+    <view
+      class="tab {{currentTab === 'all' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="all"
+    >
+      <text>全部</text>
+    </view>
+    <view
+      class="tab {{currentTab === 'open' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="open"
+    >
+      <text>报名中</text>
+    </view>
+    <view
+      class="tab {{currentTab === 'ongoing' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="ongoing"
+    >
+      <text>进行中</text>
+    </view>
+    <view
+      class="tab {{currentTab === 'ended' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="ended"
+    >
+      <text>已结束</text>
+    </view>
+  </view>
+
+  <!-- 地区筛选 -->
+  <view class="location-filter">
+    <view class="filter-row">
+      <picker
+        mode="selector"
+        range="{{countries}}"
+        bindchange="onFilterCountryChange"
+        value="{{filterCountryIndex}}"
+      >
+        <view class="filter-pill {{filterCountry ? 'filter-active' : ''}}">
+          <text>{{filterCountry || '全部地区'}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
+      <picker
+        mode="selector"
+        range="{{filterCities}}"
+        bindchange="onFilterCityChange"
+        value="{{filterCityIndex}}"
+        disabled="{{filterCities.length === 0}}"
+      >
+        <view class="filter-pill {{filterCity ? 'filter-active' : ''}} {{filterCities.length === 0 ? 'filter-disabled' : ''}}">
+          <text>{{filterCity || '全部城市'}}</text>
+          <text class="filter-arrow">▼</text>
+        </view>
+      </picker>
+      <view class="filter-clear" wx:if="{{filterCountry}}" bindtap="clearFilter">
+        <text>清除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view class="activity-list" wx:if="{{activities.length > 0}}">
+    <activity-card
+      wx:for="{{activities}}"
+      wx:key="_id"
+      activity="{{item}}"
+    />
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && activities.length === 0}}">
+    <text class="empty-icon">🎉</text>
+    <text class="empty-text">{{currentTab === 'all' ? '还没有活动，快来创建一个吧' : '暂无相关活动'}}</text>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{loading}}">
+    <text class="load-text">加载中...</text>
+  </view>
+  <view class="load-more" wx:if="{{!loading && !hasMore && activities.length > 0}}">
+    <text class="load-text">没有更多了</text>
+  </view>
+
+  <!-- 创建活动按钮 -->
+  <view class="fab" bindtap="goCreate">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

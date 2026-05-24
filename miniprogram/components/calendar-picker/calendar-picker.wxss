@@ -1,0 +1,83 @@
+.calendar {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.cal-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0 20rpx;
+}
+
+.cal-nav {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cal-arrow {
+  font-size: 36rpx;
+  color: #374151;
+}
+
+.cal-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8rpx;
+}
+
+.cal-weekday {
+  text-align: center;
+  font-size: 22rpx;
+  color: #9CA3AF;
+  padding: 8rpx 0;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 4rpx;
+}
+
+.cal-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72rpx;
+  border-radius: 50%;
+}
+
+.day-text {
+  font-size: 26rpx;
+  color: #374151;
+}
+
+.day-disabled {
+  opacity: 0.3;
+}
+
+.day-today .day-text {
+  color: #4F46E5;
+  font-weight: 600;
+}
+
+.day-selected {
+  background-color: #4F46E5;
+}
+
+.day-selected .day-text {
+  color: #ffffff;
+  font-weight: 600;
+}

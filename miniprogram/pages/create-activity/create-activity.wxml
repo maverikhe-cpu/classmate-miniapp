@@ -1,0 +1,119 @@
+<view class="page">
+  <view class="form">
+    <!-- 标题 -->
+    <view class="form-group">
+      <text class="form-label">活动名称 *</text>
+      <input
+        class="form-input"
+        placeholder="例如：周末聚餐"
+        value="{{title}}"
+        bindinput="onTitleInput"
+        maxlength="50"
+      />
+    </view>
+
+    <!-- 开始时间 -->
+    <view class="form-group">
+      <text class="form-label">开始时间 *</text>
+      <view class="datetime-row">
+        <view class="datetime-value {{startDate ? '' : 'placeholder'}}" bindtap="toggleStartCalendar">
+          {{startDisplay || '选择日期'}}
+        </view>
+        <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+          <view class="datetime-value {{startTime ? '' : 'placeholder'}}">
+            {{startTime || '选择时间'}}
+          </view>
+        </picker>
+      </view>
+      <view wx:if="{{showStartCalendar}}" class="calendar-wrap">
+        <calendar-picker value="{{startDate}}" bind:change="onStartDateChange" />
+      </view>
+    </view>
+
+    <!-- 结束时间 -->
+    <view class="form-group">
+      <text class="form-label">结束时间 *</text>
+      <view class="datetime-row">
+        <view class="datetime-value {{endDate ? '' : 'placeholder'}}" bindtap="toggleEndCalendar">
+          {{endDisplay || '选择日期'}}
+        </view>
+        <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+          <view class="datetime-value {{endTime ? '' : 'placeholder'}}">
+            {{endTime || '选择时间'}}
+          </view>
+        </picker>
+      </view>
+      <view wx:if="{{showEndCalendar}}" class="calendar-wrap">
+        <calendar-picker value="{{endDate}}" minDate="{{startDate}}" bind:change="onEndDateChange" />
+      </view>
+    </view>
+
+    <!-- 地区 -->
+    <view class="form-group">
+      <text class="form-label">活动地区 *</text>
+      <view class="datetime-row">
+        <picker mode="selector" range="{{countries}}" bindchange="onCountryChange" value="{{countryIndex}}">
+          <view class="picker-value">{{country || '选择国家'}}</view>
+        </picker>
+        <picker mode="selector" range="{{cities}}" bindchange="onCityChange" value="{{cityIndex}}" disabled="{{cities.length === 0}}">
+          <view class="picker-value {{cities.length === 0 ? 'picker-disabled' : ''}}">{{city || '选择城市'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 地点 -->
+    <view class="form-group">
+      <text class="form-label">具体地点</text>
+      <input class="form-input" placeholder="例如：南门火锅店" value="{{location}}" bindinput="onLocationInput" maxlength="100" />
+    </view>
+
+    <!-- 人数 -->
+    <view class="form-group">
+      <text class="form-label">人数限制</text>
+      <view class="limit-row">
+        <switch checked="{{hasLimit}}" bindchange="onLimitToggle" color="#4F46E5" />
+        <text class="limit-text">{{hasLimit ? '限制人数' : '不限人数'}}</text>
+      </view>
+      <input wx:if="{{hasLimit}}" class="form-input" type="number" placeholder="最大参加人数" value="{{maxMembers}}" bindinput="onMaxMembersInput" />
+    </view>
+
+    <!-- 报名截止 -->
+    <view class="form-group">
+      <text class="form-label">报名截止时间</text>
+      <view class="datetime-row">
+        <view class="datetime-value {{deadlineDate ? '' : 'placeholder'}}" bindtap="toggleDeadlineCalendar">
+          {{deadlineDisplay || '不限'}}
+        </view>
+        <picker mode="time" value="{{deadlineTime}}" bindchange="onDeadlineTimeChange">
+          <view class="datetime-value {{deadlineTime ? '' : 'placeholder'}}">
+            {{deadlineTime || '不限'}}
+          </view>
+        </picker>
+      </view>
+      <view wx:if="{{showDeadlineCalendar}}" class="calendar-wrap">
+        <calendar-picker value="{{deadlineDate}}" bind:change="onDeadlineDateChange" />
+      </view>
+      <view wx:if="{{deadlineDate}}" class="clear-deadline" bindtap="clearDeadline">
+        <text class="clear-text">清除截止时间</text>
+      </view>
+    </view>
+
+    <!-- 描述 -->
+    <view class="form-group">
+      <text class="form-label">活动详情</text>
+      <textarea
+        class="form-textarea"
+        placeholder="描述一下活动内容、注意事项等..."
+        value="{{description}}"
+        bindinput="onDescriptionInput"
+        maxlength="500"
+        auto-height
+      />
+      <text class="char-count">{{description.length}}/500</text>
+    </view>
+  </view>
+
+  <view class="submit-area safe-bottom">
+    <button class="btn-primary submit-btn" bindtap="submit" loading="{{submitting}}" disabled="{{submitting}}">创建活动</button>
+  </view>
+</view>

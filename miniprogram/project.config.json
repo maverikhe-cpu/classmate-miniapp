@@ -1,0 +1,7 @@
+{
+  "setting": {
+    "minifyWXML": true,
+    "enhance": true,
+    "es6": true
+  }
+}

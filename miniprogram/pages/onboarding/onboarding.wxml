@@ -1,0 +1,143 @@
+<view class="page">
+  <!-- Step 1: 输入姓名验证 -->
+  <view class="step-container" wx:if="{{step === 1}}">
+    <view class="step-header">
+      <text class="step-badge">1/3</text>
+      <text class="step-title">身份验证</text>
+      <text class="step-desc">请输入你在通讯录中的姓名</text>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">姓名</text>
+      <input
+        class="form-input"
+        placeholder="请输入真实姓名"
+        value="{{inputName}}"
+        bindinput="onNameInput"
+        bindconfirm="searchAndBind"
+        maxlength="20"
+        adjust-position="{{true}}"
+      />
+    </view>
+
+    <view class="error-msg" wx:if="{{errorMessage}}">
+      <text class="error-text">{{errorMessage}}</text>
+    </view>
+
+    <button
+      class="btn-primary btn-verify"
+      bindtap="searchAndBind"
+      disabled="{{!inputName}}"
+    >
+      验证身份
+    </button>
+
+    <view class="verify-hint">
+      <text class="verify-hint-text">姓名需与班级通讯录一致方可通过验证</text>
+    </view>
+  </view>
+
+  <!-- Step 2: 完善资料 -->
+  <view class="step-container" wx:if="{{step === 2}}">
+    <view class="step-header">
+      <view class="back-btn" bindtap="goBack">‹ 返回</view>
+      <text class="step-badge">2/3</text>
+      <text class="step-title">完善个人资料</text>
+      <text class="step-desc">让大家认识你</text>
+    </view>
+
+    <view class="match-info">
+      <text class="match-icon">✓</text>
+      <text class="match-text">已验证：{{matchResult.nickName}}（{{matchResult.studentId}}）</text>
+    </view>
+
+    <view class="avatar-section">
+      <button class="avatar-chooser" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image
+          class="avatar-preview"
+          src="{{avatarUrl || '/images/default-avatar.png'}}"
+          mode="aspectFill"
+        />
+        <text class="avatar-hint">点击设置头像</text>
+      </button>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">姓名</text>
+      <input
+        class="form-input"
+        type="nickname"
+        value="{{editName}}"
+        disabled="{{true}}"
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">个性签名</text>
+      <input
+        class="form-input"
+        value="{{editBio}}"
+        bindinput="onEditBioInput"
+        maxlength="50"
+        placeholder="写点什么吧..."
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">所在地区</text>
+      <view class="picker-row">
+        <picker
+          mode="selector"
+          range="{{countries}}"
+          bindchange="onEditCountryChange"
+          value="{{editCountryIndex}}"
+        >
+          <view class="picker-value">{{editCountry || '选择国家'}}</view>
+        </picker>
+        <picker
+          mode="selector"
+          range="{{editCities}}"
+          bindchange="onEditCityChange"
+          value="{{editCityIndex}}"
+          disabled="{{editCities.length === 0}}"
+        >
+          <view class="picker-value {{editCities.length === 0 ? 'picker-disabled' : ''}}">{{editCity || '选择城市'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <button class="btn-primary btn-next" bindtap="goToStep3">下一步</button>
+  </view>
+
+  <!-- Step 3: 确认完成 -->
+  <view class="step-container step-final" wx:if="{{step === 3}}">
+    <view class="step-header">
+      <view class="back-btn" bindtap="goBack">‹ 返回</view>
+      <text class="step-badge">3/3</text>
+      <text class="step-title">准备就绪</text>
+      <text class="step-desc">确认你的信息</text>
+    </view>
+
+    <view class="confirm-card">
+      <image
+        class="confirm-avatar"
+        src="{{avatarUrl || '/images/default-avatar.png'}}"
+        mode="aspectFill"
+      />
+      <text class="confirm-name">{{editName}}</text>
+      <text class="confirm-bio" wx:if="{{editBio}}">{{editBio}}</text>
+      <text class="confirm-location" wx:if="{{editCountry}}">
+        {{editCountry}}{{editCity ? ' · ' + editCity : ''}}
+      </text>
+    </view>
+
+    <button
+      class="btn-primary btn-complete"
+      bindtap="completeOnboarding"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+    >
+      进入同学圈
+    </button>
+  </view>
+</view>

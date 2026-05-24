@@ -1,0 +1,174 @@
+<view class="page">
+  <!-- 用户信息卡片 -->
+  <view class="profile-card">
+    <view class="profile-header">
+      <image
+        class="avatar-large profile-avatar"
+        src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"
+        mode="aspectFill"
+        bindtap="chooseAvatar"
+      />
+      <view class="profile-info">
+        <text class="profile-name">{{userInfo.nickName || '同学'}}</text>
+        <text class="profile-bio">{{userInfo.bio || '还没有个性签名'}}</text>
+        <view class="profile-location" wx:if="{{userInfo.city}}">
+          <text class="location-icon">🌍</text>
+          <text class="location-text">{{userInfo.country}} · {{userInfo.city}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="profile-stats">
+      <view class="stat-item">
+        <text class="stat-number">{{myActivities.length}}</text>
+        <text class="stat-label">参加活动</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{createdCount}}</text>
+        <text class="stat-label">发起活动</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑信息 -->
+  <view class="card" bindtap="editProfile">
+    <view class="menu-item">
+      <text class="menu-icon">✏️</text>
+      <text class="menu-text">编辑资料</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 我参加的活动 -->
+  <view class="card">
+    <view class="section-header" bindtap="goMyActivities">
+      <text class="section-title">我参加的活动</text>
+      <text class="section-more">查看全部 ›</text>
+    </view>
+    <view wx:if="{{myActivities.length > 0}}">
+      <view
+        class="activity-item"
+        wx:for="{{myActivities}}"
+        wx:key="_id"
+        bindtap="goDetail"
+        data-id="{{item._id}}"
+      >
+        <text class="activity-item-title">{{item.title}}</text>
+        <view class="activity-item-meta">
+          <text class="tag {{item.statusTagClass}}" style="font-size:20rpx; padding:2rpx 12rpx;">{{item.statusText}}</text>
+          <text class="activity-item-time">{{item.formattedDate}}</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-hint">
+      <text class="empty-text">还没有参加活动</text>
+    </view>
+  </view>
+</view>
+
+<!-- 编辑资料弹窗 -->
+<view class="modal-mask" wx:if="{{showEditModal}}" bindtap="closeEditModal" catchtouchmove="preventMove">
+  <view class="modal-content" catchtap="preventMove">
+    <text class="modal-title">编辑资料</text>
+
+    <view class="form-group">
+      <text class="form-label">姓名</text>
+      <input
+        class="form-input"
+        value="{{editName}}"
+        bindinput="onEditNameInput"
+        maxlength="20"
+        adjust-position="{{true}}"
+        placeholder="请输入姓名"
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">个性签名</text>
+      <input
+        class="form-input"
+        value="{{editBio}}"
+        bindinput="onEditBioInput"
+        maxlength="50"
+        adjust-position="{{true}}"
+        placeholder="写点什么吧..."
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">所在地区</text>
+      <view class="picker-row">
+        <picker
+          mode="selector"
+          range="{{countries}}"
+          bindchange="onEditCountryChange"
+          value="{{editCountryIndex}}"
+        >
+          <view class="picker-value">{{editCountry || '选择国家'}}</view>
+        </picker>
+        <view wx:if="{{editCities.length === 0}}" class="picker-value picker-disabled">选择城市</view>
+        <picker
+          wx:else
+          mode="selector"
+          range="{{editCities}}"
+          bindchange="onEditCityChange"
+          value="{{editCityIndex}}"
+        >
+          <view class="picker-value">{{editCity || '选择城市'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">微信号</text>
+      <input
+        class="form-input"
+        value="{{editWechat}}"
+        bindinput="onEditWechatInput"
+        maxlength="50"
+        adjust-position="{{true}}"
+        placeholder="选填"
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">电子邮箱</text>
+      <input
+        class="form-input"
+        value="{{editEmail}}"
+        bindinput="onEditEmailInput"
+        maxlength="80"
+        adjust-position="{{true}}"
+        placeholder="选填"
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">电话号码</text>
+      <input
+        class="form-input"
+        value="{{editPhone}}"
+        bindinput="onEditPhoneInput"
+        maxlength="30"
+        adjust-position="{{true}}"
+        placeholder="选填"
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">详细地址</text>
+      <input
+        class="form-input"
+        value="{{editAddress}}"
+        bindinput="onEditAddressInput"
+        maxlength="200"
+        adjust-position="{{true}}"
+        placeholder="选填"
+      />
+    </view>
+
+    <view class="modal-actions">
+      <button class="btn-secondary modal-btn" bindtap="closeEditModal">取消</button>
+      <button class="btn-primary modal-btn" bindtap="saveProfile">保存</button>
+    </view>
+  </view>
+</view>
