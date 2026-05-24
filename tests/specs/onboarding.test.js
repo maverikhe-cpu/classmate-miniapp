@@ -1,4 +1,4 @@
-const { getMiniProgram, waitFor, waitForText, sleep, log } = require('../helper')
+const { getMiniProgram, sleep, log } = require('../helper')
 
 const SUITE = 'Onboarding'
 
@@ -15,69 +15,88 @@ async function testOnboardingPageLoads(mp) {
 
   const badge = await page.$('.step-badge')
   const badgeText = badge ? await badge.text() : ''
-
   if (!badgeText.includes('1/3')) {
-    const pageData = await page.data()
-    log(SUITE, `Page data step: ${JSON.stringify(pageData.step)}`)
-    log(SUITE, `Page data keys: ${Object.keys(pageData).join(', ')}`)
     throw new Error(`Expected step badge "1/3", got "${badgeText}"`)
   }
 
   const title = await page.$('.step-title')
   const titleText = title ? await title.text() : ''
-  if (!titleText.includes('找到我的档案')) {
-    throw new Error(`Expected title "找到我的档案", got "${titleText}"`)
+  if (!titleText.includes('身份验证')) {
+    throw new Error(`Expected title "身份验证", got "${titleText}"`)
   }
 }
 
-async function testSearchClassmate(mp) {
+async function testStep1FormElements(mp) {
   const page = await mp.currentPage()
-  const searchInput = await page.$('.search-input')
 
-  if (!searchInput) {
-    throw new Error('Search input not found')
+  const input = await page.$('.form-input')
+  if (!input) {
+    throw new Error('Name input not found on step 1')
   }
 
-  await searchInput.input('张')
-  await sleep(1000)
-
-  const listItems = await page.$$('.classmate-item')
-  if (listItems.length === 0) {
-    throw new Error('Expected search results for "张", got 0 items')
+  const verifyBtn = await page.$('.btn-verify')
+  if (!verifyBtn) {
+    throw new Error('Verify button not found on step 1')
   }
 
-  log(SUITE, `Search "张" returned ${listItems.length} results`)
+  const hint = await page.$('.verify-hint-text')
+  if (!hint) {
+    throw new Error('Verify hint not found on step 1')
+  }
+
+  const hintText = hint ? await hint.text() : ''
+  if (!hintText.includes('通讯录')) {
+    throw new Error(`Expected hint about 通讯录, got "${hintText}"`)
+  }
+
+  log(SUITE, 'Step 1 form elements present (input, verify button, hint)')
 }
 
-async function testSelectClassmate(mp) {
+async function testStep1NameInputAndError(mp) {
   const page = await mp.currentPage()
-  const firstItem = await page.$('.classmate-item:not(.item-bound)')
 
-  if (!firstItem) {
-    throw new Error('No unbound classmate found to select')
+  const input = await page.$('.form-input')
+  await input.input('不存在的名字')
+  await sleep(500)
+
+  const verifyBtn = await page.$('.btn-verify')
+  await verifyBtn.tap()
+  await sleep(2000)
+
+  const errorMsg = await page.$('.error-text')
+  if (!errorMsg) {
+    const pageData = await page.data()
+    log(SUITE, `Page data errorMessage: ${pageData.errorMessage}`)
+    throw new Error('Expected error message for invalid name')
   }
 
-  await firstItem.tap()
-  await sleep(1500)
+  const errorText = await errorMsg.text()
+  log(SUITE, `Error displayed: "${errorText}"`)
+}
+
+async function testStep2Structure(mp) {
+  const page = await mp.currentPage()
 
   const stepBadge = await page.$('.step-badge')
   const badgeText = stepBadge ? await stepBadge.text() : ''
   if (!badgeText.includes('2/3')) {
-    throw new Error(`Expected step 2/3 after selecting classmate, got "${badgeText}"`)
-  }
-}
-
-async function testProfileFormStep(mp) {
-  const page = await mp.currentPage()
-
-  const nameInput = await page.$('.form-input')
-  if (!nameInput) {
-    throw new Error('Name input not found on step 2')
+    throw new Error(`Expected step 2/3, got "${badgeText}"`)
   }
 
-  const nameHint = await page.$('.avatar-hint')
-  if (!nameHint) {
+  const matchInfo = await page.$('.match-info')
+  if (!matchInfo) {
+    throw new Error('Match info not found on step 2')
+  }
+
+  const avatarChooser = await page.$('.avatar-chooser')
+  if (!avatarChooser) {
     throw new Error('Avatar chooser not found on step 2')
+  }
+
+  const inputs = await page.$$('.form-input')
+  const disabledInput = await page.$('.form-input[disabled]')
+  if (!disabledInput) {
+    log(SUITE, 'Warning: name input not marked disabled')
   }
 
   const nextBtn = await page.$('.btn-next')
@@ -85,18 +104,17 @@ async function testProfileFormStep(mp) {
     throw new Error('Next button not found on step 2')
   }
 
-  await nextBtn.tap()
-  await sleep(1000)
+  log(SUITE, `Step 2 structure OK: ${inputs.length} inputs, avatar chooser, match info`)
+}
+
+async function testStep3ConfirmCard(mp) {
+  const page = await mp.currentPage()
 
   const stepBadge = await page.$('.step-badge')
   const badgeText = stepBadge ? await stepBadge.text() : ''
   if (!badgeText.includes('3/3')) {
-    throw new Error(`Expected step 3/3 after clicking next, got "${badgeText}"`)
+    throw new Error(`Expected step 3/3, got "${badgeText}"`)
   }
-}
-
-async function testConfirmStep(mp) {
-  const page = await mp.currentPage()
 
   const confirmAvatar = await page.$('.confirm-avatar')
   if (!confirmAvatar) {
@@ -112,15 +130,22 @@ async function testConfirmStep(mp) {
   if (!completeBtn) {
     throw new Error('Complete button not found on step 3')
   }
+
+  const completeText = await completeBtn.text()
+  if (!completeText.includes('进入同学圈')) {
+    throw new Error(`Expected "进入同学圈", got "${completeText}"`)
+  }
+
+  log(SUITE, 'Step 3 confirm card renders correctly')
 }
 
 module.exports = {
   name: 'Onboarding',
   tests: [
-    { name: 'Page loads with step 1', fn: testOnboardingPageLoads },
-    { name: 'Search classmate by name', fn: testSearchClassmate },
-    { name: 'Select classmate navigates to step 2', fn: testSelectClassmate },
-    { name: 'Profile form step renders', fn: testProfileFormStep },
-    { name: 'Confirm step renders', fn: testConfirmStep }
+    { name: 'Page loads with step 1 身份验证', fn: testOnboardingPageLoads },
+    { name: 'Step 1 form elements present', fn: testStep1FormElements },
+    { name: 'Invalid name shows error', fn: testStep1NameInputAndError },
+    { name: 'Step 2 structure after bind (needs valid match)', fn: testStep2Structure },
+    { name: 'Step 3 confirm card renders', fn: testStep3ConfirmCard }
   ]
 }
