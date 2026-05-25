@@ -13,7 +13,8 @@ Page({
     formattedDate: '',
     formattedTimeRange: '',
     formattedDeadline: '',
-    creatorName: ''
+    creatorName: '',
+    actionLoading: false
   },
 
   onLoad(options) {
@@ -76,6 +77,7 @@ Page({
   },
 
   async signup() {
+    this.setData({ actionLoading: true })
     try {
       const res = await wx.cloud.callFunction({
         name: 'signupActivity',
@@ -91,6 +93,8 @@ Page({
     } catch (err) {
       console.error('signup error:', err)
       wx.showToast({ title: '报名失败', icon: 'none' })
+    } finally {
+      this.setData({ actionLoading: false })
     }
   },
 
@@ -105,6 +109,7 @@ Page({
 
     if (!confirmed) return
 
+    this.setData({ actionLoading: true })
     try {
       const res = await wx.cloud.callFunction({
         name: 'cancelSignup',
@@ -120,6 +125,8 @@ Page({
     } catch (err) {
       console.error('cancelSignup error:', err)
       wx.showToast({ title: '取消失败', icon: 'none' })
+    } finally {
+      this.setData({ actionLoading: false })
     }
   },
 
@@ -134,6 +141,7 @@ Page({
 
     if (!confirmed) return
 
+    this.setData({ actionLoading: true })
     try {
       await wx.cloud.database().collection('activities').doc(this.activityId).update({
         data: { status: 'cancelled' }
@@ -144,6 +152,8 @@ Page({
     } catch (err) {
       console.error('cancelActivity error:', err)
       wx.showToast({ title: '取消失败', icon: 'none' })
+    } finally {
+      this.setData({ actionLoading: false })
     }
   },
 

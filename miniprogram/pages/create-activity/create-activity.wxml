@@ -2,7 +2,7 @@
   <view class="form">
     <!-- 标题 -->
     <view class="form-group">
-      <text class="form-label">活动名称 *</text>
+      <text class="form-label">活动名称 <text class="required">*</text></text>
       <input
         class="form-input"
         placeholder="例如：周末聚餐"
@@ -14,10 +14,11 @@
 
     <!-- 开始时间 -->
     <view class="form-group">
-      <text class="form-label">开始时间 *</text>
+      <text class="form-label">开始时间 <text class="required">*</text></text>
       <view class="datetime-row">
         <view class="datetime-value {{startDate ? '' : 'placeholder'}}" bindtap="toggleStartCalendar">
           {{startDisplay || '选择日期'}}
+          <text class="value-arrow">{{showStartCalendar ? '▲' : '▼'}}</text>
         </view>
         <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
           <view class="datetime-value {{startTime ? '' : 'placeholder'}}">
@@ -25,17 +26,15 @@
           </view>
         </picker>
       </view>
-      <view wx:if="{{showStartCalendar}}" class="calendar-wrap">
-        <calendar-picker value="{{startDate}}" bind:change="onStartDateChange" />
-      </view>
     </view>
 
     <!-- 结束时间 -->
     <view class="form-group">
-      <text class="form-label">结束时间 *</text>
+      <text class="form-label">结束时间 <text class="required">*</text></text>
       <view class="datetime-row">
         <view class="datetime-value {{endDate ? '' : 'placeholder'}}" bindtap="toggleEndCalendar">
           {{endDisplay || '选择日期'}}
+          <text class="value-arrow">{{showEndCalendar ? '▲' : '▼'}}</text>
         </view>
         <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
           <view class="datetime-value {{endTime ? '' : 'placeholder'}}">
@@ -43,14 +42,11 @@
           </view>
         </picker>
       </view>
-      <view wx:if="{{showEndCalendar}}" class="calendar-wrap">
-        <calendar-picker value="{{endDate}}" minDate="{{startDate}}" bind:change="onEndDateChange" />
-      </view>
     </view>
 
     <!-- 地区 -->
     <view class="form-group">
-      <text class="form-label">活动地区 *</text>
+      <text class="form-label">活动地区 <text class="required">*</text></text>
       <view class="datetime-row">
         <picker mode="selector" range="{{countries}}" bindchange="onCountryChange" value="{{countryIndex}}">
           <view class="picker-value">{{country || '选择国家'}}</view>
@@ -83,15 +79,13 @@
       <view class="datetime-row">
         <view class="datetime-value {{deadlineDate ? '' : 'placeholder'}}" bindtap="toggleDeadlineCalendar">
           {{deadlineDisplay || '不限'}}
+          <text class="value-arrow">{{showDeadlineCalendar ? '▲' : '▼'}}</text>
         </view>
         <picker mode="time" value="{{deadlineTime}}" bindchange="onDeadlineTimeChange">
           <view class="datetime-value {{deadlineTime ? '' : 'placeholder'}}">
             {{deadlineTime || '不限'}}
           </view>
         </picker>
-      </view>
-      <view wx:if="{{showDeadlineCalendar}}" class="calendar-wrap">
-        <calendar-picker value="{{deadlineDate}}" bind:change="onDeadlineDateChange" />
       </view>
       <view wx:if="{{deadlineDate}}" class="clear-deadline" bindtap="clearDeadline">
         <text class="clear-text">清除截止时间</text>
@@ -111,6 +105,34 @@
       />
       <text class="char-count">{{description.length}}/500</text>
     </view>
+  </view>
+
+  <!-- Calendar bottom sheet -->
+  <view class="sheet-mask" wx:if="{{showStartCalendar || showEndCalendar || showDeadlineCalendar}}" bindtap="closeAllCalendars"></view>
+  <view class="sheet-panel {{showStartCalendar || showEndCalendar || showDeadlineCalendar ? 'sheet-visible' : ''}}">
+    <view class="sheet-header">
+      <text class="sheet-cancel" bindtap="closeAllCalendars">取消</text>
+      <text class="sheet-title">
+        {{showStartCalendar ? '选择开始日期' : showEndCalendar ? '选择结束日期' : '选择截止日期'}}
+      </text>
+      <text class="sheet-confirm" bindtap="closeAllCalendars">确定</text>
+    </view>
+    <calendar-picker
+      wx:if="{{showStartCalendar}}"
+      value="{{startDate}}"
+      bind:change="onStartDateChange"
+    />
+    <calendar-picker
+      wx:if="{{showEndCalendar}}"
+      value="{{endDate}}"
+      minDate="{{startDate}}"
+      bind:change="onEndDateChange"
+    />
+    <calendar-picker
+      wx:if="{{showDeadlineCalendar}}"
+      value="{{deadlineDate}}"
+      bind:change="onDeadlineDateChange"
+    />
   </view>
 
   <view class="submit-area safe-bottom">

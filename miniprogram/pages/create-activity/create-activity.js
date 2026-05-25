@@ -73,6 +73,10 @@ Page({
     this.setData({ showDeadlineCalendar: !this.data.showDeadlineCalendar, showStartCalendar: false, showEndCalendar: false })
   },
 
+  closeAllCalendars() {
+    this.setData({ showStartCalendar: false, showEndCalendar: false, showDeadlineCalendar: false })
+  },
+
   onStartDateChange(e) {
     const startDate = e.detail.value
     const updates = { startDate, showStartCalendar: false }
