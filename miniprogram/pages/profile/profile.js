@@ -150,9 +150,7 @@ Page({
     this.setData({ showEditModal: false })
   },
 
-  preventMove() {
-    return
-  },
+  doNothing() {},
 
   onEditNameInput(e) {
     this.setData({ editName: e.detail.value })

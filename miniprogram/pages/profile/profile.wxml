@@ -66,105 +66,107 @@
 </view>
 
 <!-- 编辑资料弹窗 -->
-<view class="modal-mask" wx:if="{{showEditModal}}" bindtap="closeEditModal" catchtouchmove="preventMove">
-  <view class="modal-content" catchtap="preventMove">
+<view class="modal-mask" wx:if="{{showEditModal}}" bindtap="closeEditModal">
+  <view class="modal-content" catchtap="doNothing">
     <text class="modal-title">编辑资料</text>
 
-    <view class="form-group">
-      <text class="form-label">姓名</text>
-      <input
-        class="form-input"
-        value="{{editName}}"
-        bindinput="onEditNameInput"
-        maxlength="20"
-        adjust-position="{{true}}"
-        placeholder="请输入姓名"
-      />
-    </view>
-
-    <view class="form-group">
-      <text class="form-label">个性签名</text>
-      <input
-        class="form-input"
-        value="{{editBio}}"
-        bindinput="onEditBioInput"
-        maxlength="50"
-        adjust-position="{{true}}"
-        placeholder="写点什么吧..."
-      />
-    </view>
-
-    <view class="form-group">
-      <text class="form-label">所在地区</text>
-      <view class="picker-row">
-        <picker
-          mode="selector"
-          range="{{countries}}"
-          bindchange="onEditCountryChange"
-          value="{{editCountryIndex}}"
-        >
-          <view class="picker-value">{{editCountry || '选择国家'}}</view>
-        </picker>
-        <view wx:if="{{editCities.length === 0}}" class="picker-value picker-disabled">选择城市</view>
-        <picker
-          wx:else
-          mode="selector"
-          range="{{editCities}}"
-          bindchange="onEditCityChange"
-          value="{{editCityIndex}}"
-        >
-          <view class="picker-value">{{editCity || '选择城市'}}</view>
-        </picker>
+    <scroll-view class="modal-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="form-group">
+        <text class="form-label">姓名</text>
+        <input
+          class="form-input"
+          value="{{editName}}"
+          bindinput="onEditNameInput"
+          maxlength="20"
+          adjust-position="{{true}}"
+          placeholder="请输入姓名"
+        />
       </view>
-    </view>
 
-    <view class="form-group">
-      <text class="form-label">微信号</text>
-      <input
-        class="form-input"
-        value="{{editWechat}}"
-        bindinput="onEditWechatInput"
-        maxlength="50"
-        adjust-position="{{true}}"
-        placeholder="选填"
-      />
-    </view>
+      <view class="form-group">
+        <text class="form-label">个性签名</text>
+        <input
+          class="form-input"
+          value="{{editBio}}"
+          bindinput="onEditBioInput"
+          maxlength="50"
+          adjust-position="{{true}}"
+          placeholder="写点什么吧..."
+        />
+      </view>
 
-    <view class="form-group">
-      <text class="form-label">电子邮箱</text>
-      <input
-        class="form-input"
-        value="{{editEmail}}"
-        bindinput="onEditEmailInput"
-        maxlength="80"
-        adjust-position="{{true}}"
-        placeholder="选填"
-      />
-    </view>
+      <view class="form-group">
+        <text class="form-label">所在地区</text>
+        <view class="picker-row">
+          <picker
+            mode="selector"
+            range="{{countries}}"
+            bindchange="onEditCountryChange"
+            value="{{editCountryIndex}}"
+          >
+            <view class="picker-value">{{editCountry || '选择国家'}}</view>
+          </picker>
+          <view wx:if="{{editCities.length === 0}}" class="picker-value picker-disabled">选择城市</view>
+          <picker
+            wx:else
+            mode="selector"
+            range="{{editCities}}"
+            bindchange="onEditCityChange"
+            value="{{editCityIndex}}"
+          >
+            <view class="picker-value">{{editCity || '选择城市'}}</view>
+          </picker>
+        </view>
+      </view>
 
-    <view class="form-group">
-      <text class="form-label">电话号码</text>
-      <input
-        class="form-input"
-        value="{{editPhone}}"
-        bindinput="onEditPhoneInput"
-        maxlength="30"
-        adjust-position="{{true}}"
-        placeholder="选填"
-      />
-    </view>
+      <view class="form-group">
+        <text class="form-label">微信号</text>
+        <input
+          class="form-input"
+          value="{{editWechat}}"
+          bindinput="onEditWechatInput"
+          maxlength="50"
+          adjust-position="{{true}}"
+          placeholder="选填"
+        />
+      </view>
 
-    <view class="form-group">
-      <text class="form-label">详细地址</text>
-      <input
-        class="form-input"
-        value="{{editAddress}}"
-        bindinput="onEditAddressInput"
-        maxlength="200"
-        adjust-position="{{true}}"
-        placeholder="选填"
-      />
-    </view>
+      <view class="form-group">
+        <text class="form-label">电子邮箱</text>
+        <input
+          class="form-input"
+          value="{{editEmail}}"
+          bindinput="onEditEmailInput"
+          maxlength="80"
+          adjust-position="{{true}}"
+          placeholder="选填"
+        />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">电话号码</text>
+        <input
+          class="form-input"
+          value="{{editPhone}}"
+          bindinput="onEditPhoneInput"
+          maxlength="30"
+          adjust-position="{{true}}"
+          placeholder="选填"
+        />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">详细地址</text>
+        <input
+          class="form-input"
+          value="{{editAddress}}"
+          bindinput="onEditAddressInput"
+          maxlength="200"
+          adjust-position="{{true}}"
+          placeholder="选填"
+        />
+      </view>
+    </scroll-view>
 
     <view class="modal-actions">
       <button class="btn-secondary modal-btn" bindtap="closeEditModal">取消</button>

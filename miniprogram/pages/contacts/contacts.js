@@ -99,24 +99,16 @@ Page({
           iconPath: '/images/marker.png',
           width: 24,
           height: 24,
-          callout: {
-            content: `${c.city} ${c.count}人`,
-            color: '#ffffff',
-            fontSize: 12,
-            borderRadius: 12,
-            bgColor: '#4F46E5',
-            padding: 8,
-            display: 'BYCLICK'
-          },
           label: {
             content: `${c.count}`,
             color: '#ffffff',
             fontSize: 10,
-            anchorX: 0,
-            anchorY: -20,
+            anchorX: -String(c.count).length * 3,
+            anchorY: -22,
             bgColor: '#4F46E5',
             borderRadius: 10,
-            padding: 4
+            padding: 4,
+            textAlign: 'center'
           }
         }
       })

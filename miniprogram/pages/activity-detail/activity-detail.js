@@ -14,7 +14,9 @@ Page({
     formattedTimeRange: '',
     formattedDeadline: '',
     creatorName: '',
-    actionLoading: false
+    actionLoading: false,
+    photos: [],
+    uploading: false
   },
 
   onLoad(options) {
@@ -66,7 +68,8 @@ Page({
         formattedDate: formatDate(startLocal),
         formattedTimeRange: `${formatTimeShort(startLocal)} - ${formatTimeShort(endLocal)}`,
         formattedDeadline: activity.signupDeadline ? formatTime(toLocalTime(new Date(activity.signupDeadline), offset)) : '',
-        creatorName: activity.creator?.nickName || '同学'
+        creatorName: activity.creator?.nickName || '同学',
+        photos: activity.photos || []
       })
     } catch (err) {
       console.error('loadDetail error:', err)
@@ -155,6 +158,144 @@ Page({
     } finally {
       this.setData({ actionLoading: false })
     }
+  },
+
+  async choosePhotos() {
+    if (this.data.uploading) return
+
+    try {
+      const chooseRes = await new Promise((resolve, reject) => {
+        wx.chooseMedia({
+          count: 9,
+          mediaType: ['image'],
+          sizeType: ['compressed'],
+          success: resolve,
+          fail: reject
+        })
+      })
+
+      if (!chooseRes.tempFiles || chooseRes.tempFiles.length === 0) return
+
+      this.setData({ uploading: true })
+      wx.showLoading({ title: '上传中' })
+
+      const openid = app.globalData.openid
+      const timestamp = Date.now()
+      const fileIDs = []
+
+      for (let i = 0; i < chooseRes.tempFiles.length; i++) {
+        const tempPath = chooseRes.tempFiles[i].tempFilePath
+        const ext = tempPath.split('.').pop() || 'jpg'
+        const cloudPath = `activity-photos/${this.activityId}/${openid}_${timestamp}_${i}.${ext}`
+
+        const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+        fileIDs.push(uploadRes.fileID)
+      }
+
+      const addRes = await wx.cloud.callFunction({
+        name: 'addActivityPhotos',
+        data: { activityId: this.activityId, fileIDs }
+      })
+
+      if (addRes.result.success) {
+        wx.showToast({ title: '上传成功', icon: 'success' })
+        this.loadDetail()
+      } else {
+        wx.showToast({ title: addRes.result.error || '上传失败', icon: 'none' })
+      }
+    } catch (err) {
+      if (err.errMsg && err.errMsg.includes('cancel')) return
+      console.error('choosePhotos error:', err)
+      wx.showToast({ title: '上传失败', icon: 'none' })
+    } finally {
+      this.setData({ uploading: false })
+      wx.hideLoading()
+    }
+  },
+
+  previewPhoto(e) {
+    const urls = this.data.photos.map(p => p.fileID)
+    const current = e.currentTarget.dataset.url
+    wx.previewImage({ urls, current })
+  },
+
+  async deletePhoto(e) {
+    const { fileid, uploader } = e.currentTarget.dataset
+    const openid = app.globalData.openid
+
+    if (openid !== this.data.activity._openid && uploader !== openid) {
+      wx.showToast({ title: '无权删除此照片', icon: 'none' })
+      return
+    }
+
+    const confirmed = await new Promise(resolve => {
+      wx.showModal({
+        title: '确认删除',
+        content: '确定要删除这张照片吗？',
+        success: res => resolve(res.confirm)
+      })
+    })
+
+    if (!confirmed) return
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'deleteActivityPhoto',
+        data: { activityId: this.activityId, fileID: fileid }
+      })
+
+      if (res.result.success) {
+        wx.showToast({ title: '已删除', icon: 'success' })
+        this.loadDetail()
+      } else {
+        wx.showToast({ title: res.result.error || '删除失败', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('deletePhoto error:', err)
+      wx.showToast({ title: '删除失败', icon: 'none' })
+    }
+  },
+
+  addToCalendar() {
+    const activity = this.data.activity
+    if (!activity) return
+
+    const offset = activity.timezoneOffset != null ? activity.timezoneOffset : 8
+    const startUtc = new Date(activity.startTime).getTime()
+    const endUtc = new Date(activity.endTime).getTime()
+    const offsetMs = offset * 3600000
+    const startTs = startUtc + offsetMs
+    const endTs = endUtc + offsetMs
+
+    const locationParts = []
+    if (activity.location) locationParts.push(activity.location)
+    if (activity.city) locationParts.push(`${activity.country} · ${activity.city}`)
+
+    wx.addPhoneCalendar({
+      startTime: startTs,
+      endTime: endTs,
+      title: activity.title,
+      location: locationParts.join(' '),
+      description: activity.description || '',
+      alarm: true,
+      success() {
+        wx.showToast({ title: '已加入日历', icon: 'success' })
+      },
+      fail(err) {
+        if (err.errMsg && err.errMsg.includes('auth')) {
+          wx.showModal({
+            title: '需要授权',
+            content: '请在设置中允许访问日历',
+            confirmText: '去设置',
+            success(res) {
+              if (res.confirm) wx.openSetting()
+            }
+          })
+        } else {
+          wx.showToast({ title: '添加失败', icon: 'none' })
+        }
+      }
+    })
   },
 
   goEdit() {

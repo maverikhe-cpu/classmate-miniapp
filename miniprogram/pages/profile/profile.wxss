@@ -162,7 +162,12 @@
   background: #ffffff;
   border-radius: 24rpx;
   padding: 40rpx;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-scroll {
+  max-height: 60vh;
 }
 
 .modal-title {

@@ -87,6 +87,49 @@
   display: block;
 }
 
+/* Photo album */
+.section-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+}
+
+.upload-btn {
+  padding: 8rpx 24rpx;
+  background-color: #4F46E5;
+  border-radius: 24rpx;
+}
+
+.upload-text {
+  font-size: 24rpx;
+  color: #ffffff;
+}
+
+.photo-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.photo-thumb {
+  width: calc((100% - 16rpx) / 3);
+  aspect-ratio: 1;
+  border-radius: 8rpx;
+  background-color: #F3F4F6;
+}
+
+.photo-empty {
+  text-align: center;
+  padding: 20rpx 0;
+}
+
 .description-text {
   font-size: 28rpx;
   color: #4B5563;

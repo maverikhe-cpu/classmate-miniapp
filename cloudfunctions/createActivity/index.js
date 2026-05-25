@@ -52,6 +52,7 @@ exports.main = async (event, context) => {
     members: [openid],
     categories: categories || [],
     coverImage: coverImage || '',
+    photos: [],
     status: 'open',
     createdAt: db.serverDate(),
     updatedAt: db.serverDate()

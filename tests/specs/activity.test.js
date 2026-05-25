@@ -33,6 +33,29 @@ async function testTabSwitching(mp) {
   log(SUITE, `Tab switching works, ${tabs.length} tabs available`)
 }
 
+async function testCategoryFilterRenders(mp) {
+  const page = await mp.switchTab('/pages/index/index')
+  await sleep(2000)
+
+  const categoryFilter = await page.$('.category-filter')
+  if (!categoryFilter) {
+    throw new Error('Category filter scroll-view not found')
+  }
+
+  const categoryPills = await page.$$('.category-pill')
+  if (categoryPills.length === 0) {
+    throw new Error('No category pills rendered')
+  }
+
+  const firstPill = await page.$('.category-pill')
+  const pillText = firstPill ? await firstPill.text() : ''
+  if (!pillText.includes('全部')) {
+    throw new Error(`Expected first pill "全部", got "${pillText}"`)
+  }
+
+  log(SUITE, `Category filter renders with ${categoryPills.length} pills`)
+}
+
 async function testLocationFilter(mp) {
   const page = await mp.currentPage()
 
@@ -95,7 +118,7 @@ async function testCreateActivityFormFields(mp) {
     labelTexts.push(await label.text())
   }
 
-  const required = ['活动名称', '开始时间', '结束时间', '活动地区', '活动详情']
+  const required = ['活动名称', '活动分类', '开始时间', '结束时间', '活动地区', '活动详情']
   for (const r of required) {
     if (!labelTexts.some(t => t.includes(r))) {
       throw new Error(`Missing required form label: "${r}"`)
@@ -110,8 +133,43 @@ async function testCreateActivityFormFields(mp) {
   log(SUITE, `Create form has ${labels.length} labels, all required fields present`)
 }
 
+async function testCategorySelectorOnCreatePage(mp) {
+  const page = await mp.reLaunch('/pages/create-activity/create-activity')
+  await sleep(2000)
+
+  const categoryTags = await page.$$('.category-tag')
+  if (categoryTags.length === 0) {
+    throw new Error('No category tags rendered on create page')
+  }
+
+  const firstTag = categoryTags[0]
+  const tagText = await firstTag.text()
+  log(SUITE, `Category tag found: "${tagText}", total ${categoryTags.length} tags`)
+
+  await firstTag.tap()
+  await sleep(500)
+
+  const activeTags = await page.$$('.category-tag-active')
+  if (activeTags.length !== 1) {
+    throw new Error(`Expected 1 active tag after tap, got ${activeTags.length}`)
+  }
+
+  log(SUITE, 'Category tag toggles active state on tap')
+
+  await firstTag.tap()
+  await sleep(500)
+
+  const activeTags2 = await page.$$('.category-tag-active')
+  if (activeTags2.length !== 0) {
+    throw new Error(`Expected 0 active tags after second tap, got ${activeTags2.length}`)
+  }
+
+  log(SUITE, 'Category tag toggles off on second tap')
+}
+
 async function testCalendarPickerIntegration(mp) {
-  const page = await mp.currentPage()
+  const page = await mp.reLaunch('/pages/create-activity/create-activity')
+  await sleep(2000)
 
   const datetimeValues = await page.$$('.datetime-value')
   if (datetimeValues.length < 4) {
@@ -175,16 +233,97 @@ async function testActivityDetailPageLoads(mp) {
   log(SUITE, 'Activity detail page loads with title, info card, share button')
 }
 
+async function testPhotoAlbumSectionOnDetailPage(mp) {
+  const page = await mp.reLaunch('/pages/index/index')
+  await sleep(2000)
+
+  const activityCard = await page.$('activity-card')
+  if (!activityCard) {
+    log(SUITE, 'Skipping photo album test — no activities in list')
+    return
+  }
+
+  await activityCard.tap()
+  await sleep(2000)
+
+  const page2 = await mp.currentPage()
+  if (!page2.path.includes('activity-detail')) {
+    log(SUITE, 'Skipping photo album test — not on detail page')
+    return
+  }
+
+  const sectionHeader = await page2.$('.section-header')
+  const pageData = await page2.data()
+
+  if (sectionHeader) {
+    const sectionTitle = await page2.$('.section-header .section-title')
+    const titleText = sectionTitle ? await sectionTitle.text() : ''
+    if (titleText.includes('活动相册')) {
+      log(SUITE, `Photo album section found: ${titleText}`)
+    }
+  } else if (pageData.isCreator || pageData.hasJoined) {
+    throw new Error('Photo album section not found for member/creator')
+  } else {
+    log(SUITE, 'Photo album section not rendered (user is not a member)')
+  }
+
+  const uploadBtn = await page2.$('.upload-btn')
+  if (pageData.isCreator || pageData.hasJoined) {
+    if (!uploadBtn) {
+      throw new Error('Upload button not found for member/creator')
+    }
+    log(SUITE, 'Upload button visible for member/creator')
+  }
+
+  const photoGrid = await page2.$('.photo-grid')
+  const photoThumbs = await page2.$$('.photo-thumb')
+  if (photoGrid) {
+    log(SUITE, `Photo grid renders with ${photoThumbs.length} photos`)
+  } else {
+    log(SUITE, 'No photo grid (no photos uploaded yet)')
+  }
+}
+
+async function testActivityCardCategoryTags(mp) {
+  const page = await mp.reLaunch('/pages/index/index')
+  await sleep(2000)
+
+  const activityCards = await page.$$('activity-card')
+  if (activityCards.length === 0) {
+    log(SUITE, 'Skipping card category test — no activity cards')
+    return
+  }
+
+  let foundCategoryTag = false
+  for (const card of activityCards) {
+    const categoryEl = await card.$('.card-category')
+    if (categoryEl) {
+      foundCategoryTag = true
+      break
+    }
+  }
+
+  if (foundCategoryTag) {
+    log(SUITE, 'Activity card category tags render')
+  } else {
+    log(SUITE, 'No category tags on cards (activities may not have categories)')
+  }
+}
+
 module.exports = {
   name: 'Activity',
   tests: [
     { name: 'Activity list page loads', fn: testActivityListLoads },
     { name: 'Tab switching works', fn: testTabSwitching },
+    { name: 'Category filter renders', fn: testCategoryFilterRenders },
     { name: 'Location filter renders', fn: testLocationFilter },
     { name: 'FAB navigates to create activity', fn: testFabButton },
     { name: 'Create activity page loads', fn: testCreateActivityPageLoads },
-    { name: 'Create form has all required fields', fn: testCreateActivityFormFields },
+    { name: 'Create form has all required fields including 分类', fn: testCreateActivityFormFields },
+    { name: 'Category selector toggles on create page', fn: testCategorySelectorOnCreatePage },
     { name: 'Calendar picker opens on date tap', fn: testCalendarPickerIntegration },
-    { name: 'Activity detail page loads', fn: testActivityDetailPageLoads }
+    { name: 'Activity detail page loads', fn: testActivityDetailPageLoads },
+    { name: 'Photo album section on detail page', fn: testPhotoAlbumSectionOnDetailPage },
+    { name: 'Activity card category tags', fn: testActivityCardCategoryTags }
   ]
 }

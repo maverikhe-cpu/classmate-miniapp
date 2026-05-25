@@ -112,6 +112,33 @@
       </view>
     </view>
 
+    <!-- Photo album -->
+    <view class="card" wx:if="{{photos.length > 0 || isCreator || hasJoined}}">
+      <view class="section-header">
+        <text class="section-title">活动相册 ({{photos.length}})</text>
+        <view class="upload-btn" wx:if="{{isCreator || hasJoined}}" bindtap="choosePhotos">
+          <text class="upload-text">{{uploading ? '上传中...' : '+ 上传'}}</text>
+        </view>
+      </view>
+      <view class="photo-grid" wx:if="{{photos.length > 0}}">
+        <image
+          wx:for="{{photos}}"
+          wx:key="fileID"
+          class="photo-thumb"
+          src="{{item.fileID}}"
+          mode="aspectFill"
+          bindtap="previewPhoto"
+          data-url="{{item.fileID}}"
+          bindlongpress="deletePhoto"
+          data-fileid="{{item.fileID}}"
+          data-uploader="{{item.uploader}}"
+        />
+      </view>
+      <view wx:elif="{{isCreator || hasJoined}}" class="photo-empty">
+        <text class="empty-text">还没有照片，快来上传吧</text>
+      </view>
+    </view>
+
     <!-- Bottom bar -->
     <view class="bottom-bar safe-bottom">
       <view class="bottom-bar-inner">
@@ -130,6 +157,10 @@
             <button class="btn-disabled flex-1" disabled>{{statusText}}</button>
           </block>
         </view>
+        <button class="btn-share" wx:if="{{isCreator || hasJoined}}" bindtap="addToCalendar">
+          <text class="share-icon">📅</text>
+          日历
+        </button>
         <button class="btn-share" open-type="share">
           <text class="share-icon">↗</text>
           分享
