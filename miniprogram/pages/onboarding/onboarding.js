@@ -8,7 +8,6 @@ Page({
     inputName: '',
     errorMessage: '',
     countries: [],
-    // editable fields
     editName: '',
     editBio: '',
     editCountry: '',
@@ -26,6 +25,10 @@ Page({
 
   onLoad() {
     this.setData({ countries: getAllCountries() })
+  },
+
+  goStart() {
+    this.setData({ step: 2 })
   },
 
   onNameInput(e) {
@@ -88,7 +91,7 @@ Page({
         editAddress: selected.address || '',
         avatarUrl: selected.avatarUrl || '',
         errorMessage: '',
-        step: 2
+        step: 3
       })
     } catch (err) {
       console.error('searchAndBind error:', err)
@@ -123,20 +126,19 @@ Page({
   },
 
   goBack() {
-    if (this.data.step === 2) {
-      this.setData({ step: 1, matchResult: null })
-    } else if (this.data.step === 3) {
-      this.setData({ step: 2 })
+    const step = this.data.step
+    if (step > 1) {
+      this.setData({ step: step - 1 })
     }
   },
 
-  goToStep3() {
+  goToStep4() {
     const { editCountry } = this.data
     if (!editCountry) {
       wx.showToast({ title: '请选择所在地区', icon: 'none' })
       return
     }
-    this.setData({ step: 3 })
+    this.setData({ step: 4 })
   },
 
   async completeOnboarding() {

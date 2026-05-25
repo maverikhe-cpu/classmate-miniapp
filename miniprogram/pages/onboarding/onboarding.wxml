@@ -1,8 +1,61 @@
 <view class="page">
-  <!-- Step 1: 输入姓名验证 -->
-  <view class="step-container" wx:if="{{step === 1}}">
+  <!-- Progress indicator (hidden on step 1 welcome) -->
+  <view class="progress-bar" wx:if="{{step > 1}}">
+    <view class="progress-step">
+      <view class="progress-dot {{step >= 2 ? 'dot-done' : ''}}">1</view>
+      <text class="progress-label">验证</text>
+    </view>
+    <view class="progress-line {{step >= 3 ? 'line-done' : ''}}"></view>
+    <view class="progress-step">
+      <view class="progress-dot {{step >= 3 ? 'dot-done' : ''}}">2</view>
+      <text class="progress-label">资料</text>
+    </view>
+    <view class="progress-line {{step >= 4 ? 'line-done' : ''}}"></view>
+    <view class="progress-step">
+      <view class="progress-dot {{step >= 4 ? 'dot-done' : ''}}">3</view>
+      <text class="progress-label">完成</text>
+    </view>
+  </view>
+
+  <!-- Step 1: Welcome intro -->
+  <view class="step-container step-welcome" wx:if="{{step === 1}}">
+    <view class="welcome-hero">
+      <text class="welcome-icon">🎓</text>
+      <text class="welcome-title">同学圈</text>
+      <text class="welcome-subtitle">9122班的专属空间</text>
+    </view>
+
+    <view class="feature-cards">
+      <view class="feature-card">
+        <text class="feature-icon">📋</text>
+        <view class="feature-text">
+          <text class="feature-name">活动组织</text>
+          <text class="feature-desc">发起聚餐、郊游、钓鱼，一键报名参加</text>
+        </view>
+      </view>
+      <view class="feature-card">
+        <text class="feature-icon">🗺️</text>
+        <view class="feature-text">
+          <text class="feature-name">同学地图</text>
+          <text class="feature-desc">看看大家都在哪里，世界那么大有你有我</text>
+        </view>
+      </view>
+      <view class="feature-card">
+        <text class="feature-icon">📸</text>
+        <view class="feature-text">
+          <text class="feature-name">活动相册</text>
+          <text class="feature-desc">共享活动精彩瞬间，留住美好回忆</text>
+        </view>
+      </view>
+    </view>
+
+    <button class="btn-primary btn-start" bindtap="goStart">开始</button>
+  </view>
+
+  <!-- Step 2: Identity verification -->
+  <view class="step-container" wx:if="{{step === 2}}">
     <view class="step-header">
-      <text class="step-badge">1/3</text>
+      <text class="step-badge">步骤 1/3</text>
       <text class="step-title">身份验证</text>
       <text class="step-desc">请输入你在通讯录中的姓名</text>
     </view>
@@ -18,6 +71,7 @@
         maxlength="20"
         adjust-position="{{true}}"
       />
+      <text class="form-hint">姓名需与班级通讯录一致方可通过验证</text>
     </view>
 
     <view class="error-msg" wx:if="{{errorMessage}}">
@@ -31,19 +85,15 @@
     >
       验证身份
     </button>
-
-    <view class="verify-hint">
-      <text class="verify-hint-text">姓名需与班级通讯录一致方可通过验证</text>
-    </view>
   </view>
 
-  <!-- Step 2: 确认并编辑个人信息 -->
-  <view class="step-container" wx:if="{{step === 2}}">
+  <!-- Step 3: Profile editing -->
+  <view class="step-container" wx:if="{{step === 3}}">
     <view class="step-header">
       <view class="back-btn" bindtap="goBack">‹ 返回</view>
-      <text class="step-badge">2/3</text>
-      <text class="step-title">确认个人信息</text>
-      <text class="step-desc">请检查并更新你的信息</text>
+      <text class="step-badge">步骤 2/3</text>
+      <text class="step-title">完善资料</text>
+      <text class="step-desc">让同学们认识你</text>
     </view>
 
     <view class="match-info">
@@ -70,10 +120,11 @@
     <view class="form-group">
       <text class="form-label">个性签名</text>
       <input class="form-input" value="{{editBio}}" bindinput="onEditBioInput" maxlength="50" placeholder="写点什么吧..." />
+      <text class="form-hint">展示在你的个人主页上</text>
     </view>
 
     <view class="form-group">
-      <text class="form-label">所在地区</text>
+      <text class="form-label">所在地区 <text class="required-mark">*</text></text>
       <view class="picker-row">
         <picker mode="selector" range="{{countries}}" bindchange="onEditCountryChange" value="{{editCountryIndex}}">
           <view class="picker-value">{{editCountry || '选择国家'}}</view>
@@ -82,11 +133,13 @@
           <view class="picker-value {{editCities.length === 0 ? 'picker-disabled' : ''}}">{{editCity || '选择城市'}}</view>
         </picker>
       </view>
+      <text class="form-hint">用于地图上的位置展示</text>
     </view>
 
     <view class="form-group">
       <text class="form-label">微信号</text>
       <input class="form-input" value="{{editWechat}}" bindinput="onEditWechatInput" maxlength="50" placeholder="选填" />
+      <text class="form-hint">仅同学可见，方便大家联系你</text>
     </view>
 
     <view class="form-group">
@@ -104,16 +157,16 @@
       <input class="form-input" value="{{editAddress}}" bindinput="onEditAddressInput" maxlength="200" placeholder="选填" />
     </view>
 
-    <button class="btn-primary btn-next" bindtap="goToStep3">下一步</button>
+    <button class="btn-primary btn-next" bindtap="goToStep4">下一步</button>
   </view>
 
-  <!-- Step 3: 确认完成 -->
-  <view class="step-container step-final" wx:if="{{step === 3}}">
+  <!-- Step 4: Confirmation + Feature guide -->
+  <view class="step-container step-final" wx:if="{{step === 4}}">
     <view class="step-header">
       <view class="back-btn" bindtap="goBack">‹ 返回</view>
-      <text class="step-badge">3/3</text>
+      <text class="step-badge">步骤 3/3</text>
       <text class="step-title">准备就绪</text>
-      <text class="step-desc">确认你的信息</text>
+      <text class="step-desc">确认信息，开始使用</text>
     </view>
 
     <view class="confirm-card">
@@ -140,9 +193,31 @@
         <text class="confirm-label">电话</text>
         <text class="confirm-value">{{editPhone}}</text>
       </view>
-      <view class="confirm-info-row" wx:if="{{editAddress}}">
-        <text class="confirm-label">地址</text>
-        <text class="confirm-value">{{editAddress}}</text>
+    </view>
+
+    <view class="guide-section">
+      <text class="guide-title">接下来你可以</text>
+      <view class="guide-grid">
+        <view class="guide-item">
+          <text class="guide-icon">📋</text>
+          <text class="guide-name">创建活动</text>
+          <text class="guide-desc">发起聚会或出游</text>
+        </view>
+        <view class="guide-item">
+          <text class="guide-icon">🗓️</text>
+          <text class="guide-name">加入日历</text>
+          <text class="guide-desc">一键同步手机日历</text>
+        </view>
+        <view class="guide-item">
+          <text class="guide-icon">🗺️</text>
+          <text class="guide-name">同学地图</text>
+          <text class="guide-desc">查看全球分布</text>
+        </view>
+        <view class="guide-item">
+          <text class="guide-icon">📸</text>
+          <text class="guide-name">活动相册</text>
+          <text class="guide-desc">共享精彩瞬间</text>
+        </view>
       </view>
     </view>
 
@@ -152,7 +227,7 @@
       loading="{{submitting}}"
       disabled="{{submitting}}"
     >
-      进入同学圈
+      开始使用同学圈
     </button>
   </view>
 </view>

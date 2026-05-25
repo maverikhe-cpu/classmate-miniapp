@@ -3,6 +3,60 @@
   background: linear-gradient(180deg, #4F46E5 0%, #6D28D9 30%, #F5F5F5 30%);
 }
 
+/* Progress indicator */
+.progress-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 64rpx 0;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progress-dot {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background-color: #E5E7EB;
+  color: #9CA3AF;
+  font-size: 22rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.dot-done {
+  background-color: #4F46E5;
+  color: #ffffff;
+}
+
+.progress-label {
+  font-size: 20rpx;
+  color: #9CA3AF;
+  margin-top: 6rpx;
+}
+
+.progress-line {
+  flex: 1;
+  height: 4rpx;
+  background-color: #E5E7EB;
+  margin: 0 12rpx;
+  margin-bottom: 24rpx;
+  transition: all 0.3s;
+}
+
+.line-done {
+  background-color: #4F46E5;
+}
+
+/* Step containers */
 .step-container {
   padding: 32rpx;
 }
@@ -45,7 +99,88 @@
   padding: 8rpx 16rpx;
 }
 
-/* Step 1: 输入姓名验证 */
+/* Step 1: Welcome */
+.step-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 64rpx;
+}
+
+.welcome-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 56rpx;
+}
+
+.welcome-icon {
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
+}
+
+.welcome-title {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 12rpx;
+}
+
+.welcome-subtitle {
+  font-size: 30rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.feature-cards {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-bottom: 64rpx;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.feature-icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+
+.feature-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 4rpx;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: #6B7280;
+}
+
+.btn-start {
+  width: 100%;
+  padding: 28rpx 0;
+  font-size: 34rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+}
+
+/* Step 2: Verify */
 .btn-verify {
   margin-top: 32rpx;
   width: 100%;
@@ -63,16 +198,7 @@
   color: #EF4444;
 }
 
-.verify-hint {
-  text-align: center;
-  margin-top: 40rpx;
-}
-
-.verify-hint-text {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.6);
-}
-
+/* Step 3: Form */
 .match-info {
   display: flex;
   flex-direction: row;
@@ -95,7 +221,6 @@
   font-weight: 500;
 }
 
-/* Step 2: 表单 */
 .avatar-section {
   display: flex;
   flex-direction: column;
@@ -157,6 +282,18 @@
   color: #9CA3AF;
 }
 
+.form-hint {
+  display: block;
+  font-size: 22rpx;
+  color: #9CA3AF;
+  margin-top: 8rpx;
+}
+
+.required-mark {
+  color: #EF4444;
+  font-size: 26rpx;
+}
+
 .picker-row {
   display: flex;
   flex-direction: row;
@@ -185,7 +322,7 @@
   width: 100%;
 }
 
-/* Step 3: 确认 */
+/* Step 4: Confirmation + Guide */
 .step-final {
   padding-top: 48rpx;
 }
@@ -193,23 +330,23 @@
 .confirm-card {
   background: #ffffff;
   border-radius: 24rpx;
-  padding: 48rpx 32rpx;
+  padding: 40rpx 32rpx;
   text-align: center;
   box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
-  margin-bottom: 48rpx;
+  margin-bottom: 32rpx;
 }
 
 .confirm-avatar {
-  width: 192rpx;
-  height: 192rpx;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
   border: 6rpx solid #EEF2FF;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .confirm-name {
   display: block;
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #1F2937;
   margin-bottom: 8rpx;
@@ -217,15 +354,9 @@
 
 .confirm-bio {
   display: block;
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #6B7280;
   margin-bottom: 12rpx;
-}
-
-.confirm-location {
-  display: block;
-  font-size: 26rpx;
-  color: #9CA3AF;
 }
 
 .confirm-info-row {
@@ -244,6 +375,57 @@
 .confirm-value {
   font-size: 24rpx;
   color: #6B7280;
+}
+
+/* Feature guide */
+.guide-section {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.guide-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.guide-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.guide-item {
+  width: calc((100% - 16rpx) / 2);
+  background: #F9FAFB;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guide-icon {
+  font-size: 40rpx;
+  margin-bottom: 8rpx;
+}
+
+.guide-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1F2937;
+  margin-bottom: 4rpx;
+}
+
+.guide-desc {
+  font-size: 20rpx;
+  color: #9CA3AF;
 }
 
 .btn-complete {

@@ -1,4 +1,4 @@
-<view class="activity-card card" bindtap="onTap">
+<view class="activity-card card {{statusTagClass === 'tag-ended' || statusTagClass === 'tag-cancelled' ? 'card-past' : ''}}" bindtap="onTap">
   <view class="card-header">
     <view class="card-title-row">
       <text class="card-title">{{activity.title}}</text>
@@ -11,9 +11,7 @@
       </view>
     </view>
     <view class="card-meta">
-      <text class="meta-item">{{formattedDate}}</text>
-      <text class="meta-dot">·</text>
-      <text class="meta-item">{{formattedTime}}</text>
+      <text class="meta-item">{{formattedDateTime}}</text>
     </view>
     <view class="card-meta" wx:if="{{activity.city}}">
       <text class="meta-icon">🌍</text>

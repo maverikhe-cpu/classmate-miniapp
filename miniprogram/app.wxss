@@ -82,6 +82,11 @@ page {
   color: #4F46E5;
 }
 
+.tag-ongoing {
+  background-color: #ECFDF5;
+  color: #059669;
+}
+
 .tag-full {
   background-color: #FEF3C7;
   color: #D97706;
@@ -89,12 +94,17 @@ page {
 
 .tag-ended {
   background-color: #F3F4F6;
-  color: #6B7280;
+  color: #9CA3AF;
 }
 
 .tag-cancelled {
   background-color: #FEE2E2;
   color: #EF4444;
+}
+
+.tag-deadline {
+  background-color: #FFF7ED;
+  color: #EA580C;
 }
 
 /* 头像 */

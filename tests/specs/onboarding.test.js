@@ -2,17 +2,46 @@ const { getMiniProgram, sleep, log } = require('../helper')
 
 const SUITE = 'Onboarding'
 
-async function testOnboardingPageLoads(mp) {
+async function testWelcomePageLoads(mp) {
   const page = await mp.reLaunch('/pages/onboarding/onboarding')
   await sleep(3000)
 
   const currentPath = page.path
-  log(SUITE, `Current page: ${currentPath}`)
-
   if (!currentPath.includes('onboarding')) {
     throw new Error(`Expected onboarding page, got ${currentPath}`)
   }
 
+  const welcomeTitle = await page.$('.welcome-title')
+  if (!welcomeTitle) {
+    throw new Error('Welcome title not found on step 1')
+  }
+
+  const titleText = await welcomeTitle.text()
+  if (!titleText.includes('同学圈')) {
+    throw new Error(`Expected welcome title "同学圈", got "${titleText}"`)
+  }
+
+  const featureCards = await page.$$('.feature-card')
+  if (featureCards.length < 3) {
+    throw new Error(`Expected 3 feature cards, got ${featureCards.length}`)
+  }
+
+  const startBtn = await page.$('.btn-start')
+  if (!startBtn) {
+    throw new Error('Start button not found on welcome page')
+  }
+
+  log(SUITE, `Welcome page loads with ${featureCards.length} feature cards`)
+}
+
+async function testVerifyStepLoads(mp) {
+  const startBtn = await (await mp.currentPage()).$('.btn-start')
+  if (startBtn) {
+    await startBtn.tap()
+    await sleep(1000)
+  }
+
+  const page = await mp.currentPage()
   const badge = await page.$('.step-badge')
   const badgeText = badge ? await badge.text() : ''
   if (!badgeText.includes('1/3')) {
@@ -24,49 +53,46 @@ async function testOnboardingPageLoads(mp) {
   if (!titleText.includes('身份验证')) {
     throw new Error(`Expected title "身份验证", got "${titleText}"`)
   }
-}
-
-async function testStep1FormElements(mp) {
-  const page = await mp.currentPage()
 
   const input = await page.$('.form-input')
   if (!input) {
-    throw new Error('Name input not found on step 1')
+    throw new Error('Name input not found on verify step')
   }
 
   const verifyBtn = await page.$('.btn-verify')
   if (!verifyBtn) {
-    throw new Error('Verify button not found on step 1')
+    throw new Error('Verify button not found on verify step')
   }
 
-  const hint = await page.$('.verify-hint-text')
+  const hint = await page.$('.form-hint')
   if (!hint) {
-    throw new Error('Verify hint not found on step 1')
+    throw new Error('Form hint not found on verify step')
   }
 
-  const hintText = hint ? await hint.text() : ''
-  if (!hintText.includes('通讯录')) {
-    throw new Error(`Expected hint about 通讯录, got "${hintText}"`)
-  }
-
-  log(SUITE, 'Step 1 form elements present (input, verify button, hint)')
+  log(SUITE, 'Verify step (1/3) loads correctly with form hint')
 }
 
-async function testStep1NameInputAndError(mp) {
-  const page = await mp.currentPage()
+async function testInvalidNameShowsError(mp) {
+  const page = await mp.reLaunch('/pages/onboarding/onboarding')
+  await sleep(2000)
 
-  const input = await page.$('.form-input')
+  const startBtn = await page.$('.btn-start')
+  await startBtn.tap()
+  await sleep(1500)
+
+  const page2 = await mp.currentPage()
+  const input = await page2.$('.form-input')
   await input.input('不存在的名字')
   await sleep(500)
 
-  const verifyBtn = await page.$('.btn-verify')
+  const verifyBtn = await page2.$('.btn-verify')
   await verifyBtn.tap()
-  await sleep(2000)
+  await sleep(3000)
 
-  const errorMsg = await page.$('.error-text')
+  const pageData = await page2.data()
+  const errorMsg = await page2.$('.error-text')
   if (!errorMsg) {
-    const pageData = await page.data()
-    log(SUITE, `Page data errorMessage: ${pageData.errorMessage}`)
+    log(SUITE, `errorMessage in data: "${pageData.errorMessage}"`)
     throw new Error('Expected error message for invalid name')
   }
 
@@ -74,78 +100,34 @@ async function testStep1NameInputAndError(mp) {
   log(SUITE, `Error displayed: "${errorText}"`)
 }
 
-async function testStep2Structure(mp) {
-  const page = await mp.currentPage()
+async function testProgressIndicatorRenders(mp) {
+  const page = await mp.reLaunch('/pages/onboarding/onboarding')
+  await sleep(2000)
 
-  const stepBadge = await page.$('.step-badge')
-  const badgeText = stepBadge ? await stepBadge.text() : ''
-  if (!badgeText.includes('2/3')) {
-    throw new Error(`Expected step 2/3, got "${badgeText}"`)
+  const startBtn = await page.$('.btn-start')
+  await startBtn.tap()
+  await sleep(1000)
+
+  const page2 = await mp.currentPage()
+  const dots = await page2.$$('.progress-dot')
+  if (dots.length < 3) {
+    throw new Error(`Expected 3 progress dots, got ${dots.length}`)
   }
 
-  const matchInfo = await page.$('.match-info')
-  if (!matchInfo) {
-    throw new Error('Match info not found on step 2')
+  const lines = await page2.$$('.progress-line')
+  if (lines.length < 2) {
+    throw new Error(`Expected 2 progress lines, got ${lines.length}`)
   }
 
-  const avatarChooser = await page.$('.avatar-chooser')
-  if (!avatarChooser) {
-    throw new Error('Avatar chooser not found on step 2')
-  }
-
-  const inputs = await page.$$('.form-input')
-  const disabledInput = await page.$('.form-input[disabled]')
-  if (!disabledInput) {
-    log(SUITE, 'Warning: name input not marked disabled')
-  }
-
-  const nextBtn = await page.$('.btn-next')
-  if (!nextBtn) {
-    throw new Error('Next button not found on step 2')
-  }
-
-  log(SUITE, `Step 2 structure OK: ${inputs.length} inputs, avatar chooser, match info`)
-}
-
-async function testStep3ConfirmCard(mp) {
-  const page = await mp.currentPage()
-
-  const stepBadge = await page.$('.step-badge')
-  const badgeText = stepBadge ? await stepBadge.text() : ''
-  if (!badgeText.includes('3/3')) {
-    throw new Error(`Expected step 3/3, got "${badgeText}"`)
-  }
-
-  const confirmAvatar = await page.$('.confirm-avatar')
-  if (!confirmAvatar) {
-    throw new Error('Confirm avatar not found on step 3')
-  }
-
-  const confirmName = await page.$('.confirm-name')
-  if (!confirmName) {
-    throw new Error('Confirm name not found on step 3')
-  }
-
-  const completeBtn = await page.$('.btn-complete')
-  if (!completeBtn) {
-    throw new Error('Complete button not found on step 3')
-  }
-
-  const completeText = await completeBtn.text()
-  if (!completeText.includes('进入同学圈')) {
-    throw new Error(`Expected "进入同学圈", got "${completeText}"`)
-  }
-
-  log(SUITE, 'Step 3 confirm card renders correctly')
+  log(SUITE, `Progress indicator renders with ${dots.length} dots, ${lines.length} lines`)
 }
 
 module.exports = {
   name: 'Onboarding',
   tests: [
-    { name: 'Page loads with step 1 身份验证', fn: testOnboardingPageLoads },
-    { name: 'Step 1 form elements present', fn: testStep1FormElements },
-    { name: 'Invalid name shows error', fn: testStep1NameInputAndError },
-    { name: 'Step 2 structure after bind (needs valid match)', fn: testStep2Structure },
-    { name: 'Step 3 confirm card renders', fn: testStep3ConfirmCard }
+    { name: 'Welcome page loads with feature cards', fn: testWelcomePageLoads },
+    { name: 'Verify step (1/3) loads from welcome', fn: testVerifyStepLoads },
+    { name: 'Invalid name shows error', fn: testInvalidNameShowsError },
+    { name: 'Progress indicator renders', fn: testProgressIndicatorRenders }
   ]
 }

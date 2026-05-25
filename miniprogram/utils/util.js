@@ -102,11 +102,11 @@ const STATUS_TEXT = {
 
 const STATUS_TAG_CLASS = {
   open: 'tag-open',
-  ongoing: 'tag-open',
+  ongoing: 'tag-ongoing',
   full: 'tag-full',
   ended: 'tag-ended',
   cancelled: 'tag-cancelled',
-  deadline_passed: 'tag-ended'
+  deadline_passed: 'tag-deadline'
 }
 
 module.exports = {

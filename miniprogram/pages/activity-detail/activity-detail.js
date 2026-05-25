@@ -260,12 +260,8 @@ Page({
     const activity = this.data.activity
     if (!activity) return
 
-    const offset = activity.timezoneOffset != null ? activity.timezoneOffset : 8
-    const startUtc = new Date(activity.startTime).getTime()
-    const endUtc = new Date(activity.endTime).getTime()
-    const offsetMs = offset * 3600000
-    const startTs = startUtc + offsetMs
-    const endTs = endUtc + offsetMs
+    const startTs = Math.floor(new Date(activity.startTime).getTime() / 1000)
+    const endTs = Math.floor(new Date(activity.endTime).getTime() / 1000)
 
     const locationParts = []
     if (activity.location) locationParts.push(activity.location)

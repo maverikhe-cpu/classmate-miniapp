@@ -141,30 +141,30 @@
 
     <!-- Bottom bar -->
     <view class="bottom-bar safe-bottom">
-      <view class="bottom-bar-inner">
-        <view class="action-buttons">
-          <block wx:if="{{isCreator}}">
-            <button class="btn-secondary flex-1" bindtap="goEdit">编辑</button>
-            <button class="btn-danger flex-1" bindtap="cancelActivity" disabled="{{actionLoading}}">取消活动</button>
-          </block>
-          <block wx:elif="{{hasJoined}}">
-            <button class="btn-secondary flex-1" bindtap="cancelSignup" disabled="{{actionLoading}}" loading="{{actionLoading}}">取消报名</button>
-          </block>
-          <block wx:elif="{{canSignup}}">
-            <button class="btn-primary flex-1" bindtap="signup" disabled="{{actionLoading}}" loading="{{actionLoading}}">立即报名</button>
-          </block>
-          <block wx:else>
-            <button class="btn-disabled flex-1" disabled>{{statusText}}</button>
-          </block>
-        </view>
-        <button class="btn-share" wx:if="{{isCreator || hasJoined}}" bindtap="addToCalendar">
-          <text class="share-icon">📅</text>
-          日历
+      <view class="quick-actions">
+        <button class="btn-quick" wx:if="{{isCreator || hasJoined}}" bindtap="addToCalendar">
+          <text class="quick-icon">📅</text>
+          <text class="quick-label">日历</text>
         </button>
-        <button class="btn-share" open-type="share">
-          <text class="share-icon">↗</text>
-          分享
+        <button class="btn-quick" open-type="share">
+          <text class="quick-icon">↗</text>
+          <text class="quick-label">分享</text>
         </button>
+      </view>
+      <view class="action-buttons">
+        <block wx:if="{{isCreator}}">
+          <button class="btn-secondary flex-1" bindtap="goEdit">编辑</button>
+          <button class="btn-danger flex-1" bindtap="cancelActivity" disabled="{{actionLoading}}">取消活动</button>
+        </block>
+        <block wx:elif="{{hasJoined}}">
+          <button class="btn-secondary flex-1" bindtap="cancelSignup" disabled="{{actionLoading}}" loading="{{actionLoading}}">取消报名</button>
+        </block>
+        <block wx:elif="{{canSignup}}">
+          <button class="btn-primary flex-1" bindtap="signup" disabled="{{actionLoading}}" loading="{{actionLoading}}">立即报名</button>
+        </block>
+        <block wx:else>
+          <button class="btn-disabled flex-1" disabled>{{statusText}}</button>
+        </block>
       </view>
     </view>
   </view>
