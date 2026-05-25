@@ -6,7 +6,7 @@ const db = cloud.database()
 const _ = db.command
 
 exports.main = async (event) => {
-  const { status = 'all', country = '', city = '', page = 0, pageSize = 20 } = event
+  const { status = 'all', country = '', city = '', category = '', page = 0, pageSize = 20 } = event
 
   try {
     let query = { status: _.neq('cancelled') }
@@ -35,6 +35,9 @@ exports.main = async (event) => {
     }
     if (city) {
       query.city = city
+    }
+    if (category) {
+      query.categories = _.elemMatch(_.eq(category))
     }
 
     const countResult = await db.collection('activities')

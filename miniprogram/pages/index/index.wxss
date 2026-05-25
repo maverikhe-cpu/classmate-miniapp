@@ -89,6 +89,30 @@
   color: #EF4444;
 }
 
+/* Category filter */
+.category-filter {
+  background-color: #ffffff;
+  padding: 16rpx 24rpx;
+  white-space: nowrap;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.category-pill {
+  display: inline-block;
+  padding: 10rpx 28rpx;
+  border-radius: 32rpx;
+  font-size: 24rpx;
+  color: #6B7280;
+  background-color: #F3F4F6;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.category-pill-active {
+  color: #4F46E5;
+  background-color: #EEF2FF;
+}
+
 .load-more {
   text-align: center;
   padding: 30rpx 0;

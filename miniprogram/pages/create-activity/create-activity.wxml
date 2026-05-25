@@ -12,6 +12,20 @@
       />
     </view>
 
+    <!-- 活动分类 -->
+    <view class="form-group">
+      <text class="form-label">活动分类</text>
+      <view class="category-tags">
+        <view
+          class="category-tag {{item.active ? 'category-tag-active' : ''}}"
+          wx:for="{{categoryItems}}"
+          wx:key="name"
+          bindtap="toggleCategory"
+          data-index="{{index}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
     <!-- 开始时间 -->
     <view class="form-group">
       <text class="form-label">开始时间 <text class="required">*</text></text>

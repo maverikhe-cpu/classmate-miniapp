@@ -25,6 +25,34 @@
   white-space: nowrap;
 }
 
+.card-categories {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.card-category {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 20rpx;
+  color: #4F46E5;
+  background-color: #EEF2FF;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+  gap: 4rpx;
+}
+
+.category-icon {
+  font-size: 18rpx;
+}
+
+.category-name {
+  font-size: 20rpx;
+}
+
 .card-meta {
   display: flex;
   flex-direction: row;

@@ -1,4 +1,5 @@
 const { getAllCountries, getCitiesByCountry } = require('../../utils/locations')
+const { CATEGORIES } = require('../../utils/categories')
 const app = getApp()
 
 Page({
@@ -13,7 +14,9 @@ Page({
     filterCountryIndex: -1,
     filterCities: [],
     filterCity: '',
-    filterCityIndex: -1
+    filterCityIndex: -1,
+    categoryList: ['全部', ...CATEGORIES],
+    filterCategory: ''
   },
 
   onLoad() {
@@ -91,6 +94,18 @@ Page({
     this.loadActivities()
   },
 
+  onFilterCategoryChange(e) {
+    const name = e.currentTarget.dataset.name
+    const filterCategory = name === '全部' ? '' : name
+    this.setData({
+      filterCategory,
+      activities: [],
+      page: 0,
+      hasMore: true
+    })
+    this.loadActivities()
+  },
+
   async loadActivities() {
     if (this.data.loading) return
 
@@ -103,6 +118,7 @@ Page({
           status: this.data.currentTab,
           country: this.data.filterCountry,
           city: this.data.filterCity,
+          category: this.data.filterCategory,
           page: this.data.page,
           pageSize: 20
         }

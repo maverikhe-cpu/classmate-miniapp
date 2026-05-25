@@ -20,7 +20,8 @@ exports.main = async (event, context) => {
     endTime,
     signupDeadline,
     maxMembers,
-    coverImage
+    coverImage,
+    categories
   } = event
 
   if (!title || !startTime || !endTime) {
@@ -49,6 +50,7 @@ exports.main = async (event, context) => {
     signupDeadline: signupDeadline ? new Date(signupDeadline) : null,
     maxMembers: maxMembers || 0,
     members: [openid],
+    categories: categories || [],
     coverImage: coverImage || '',
     status: 'open',
     createdAt: db.serverDate(),

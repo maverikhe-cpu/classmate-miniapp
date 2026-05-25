@@ -109,10 +109,12 @@
   z-index: 201;
   transform: translateY(100%);
   transition: transform 0.3s ease;
+  pointer-events: none;
 }
 
 .sheet-visible {
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 .sheet-header {
@@ -172,6 +174,29 @@
   font-size: 28rpx;
   color: #6B7280;
   margin-left: 16rpx;
+}
+
+/* Category tags */
+.category-tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.category-tag {
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+  font-size: 24rpx;
+  color: #6B7280;
+  background-color: #F3F4F6;
+  border: 2rpx solid #E5E7EB;
+}
+
+.category-tag-active {
+  color: #ffffff;
+  background-color: #4F46E5;
+  border-color: #4F46E5;
 }
 
 .char-count {

@@ -63,6 +63,19 @@
     </view>
   </view>
 
+  <!-- 分类筛选 -->
+  <scroll-view class="category-filter" scroll-x enable-flex>
+    <view
+      class="category-pill {{filterCategory === '' && item === '全部' ? 'category-pill-active' : ''}} {{filterCategory === item ? 'category-pill-active' : ''}}"
+      wx:for="{{categoryList}}"
+      wx:key="*this"
+      bindtap="onFilterCategoryChange"
+      data-name="{{item}}"
+    >
+      <text>{{item}}</text>
+    </view>
+  </scroll-view>
+
   <!-- 活动列表 -->
   <view class="activity-list" wx:if="{{activities.length > 0}}">
     <activity-card

@@ -1,4 +1,5 @@
 const { formatDate, formatTimeShort, toLocalTime, getActivityStatus, STATUS_TEXT, STATUS_TAG_CLASS } = require('../../utils/util')
+const { CATEGORY_ICONS } = require('../../utils/categories')
 
 Component({
   properties: {
@@ -17,12 +18,18 @@ Component({
       const startLocal = toLocalTime(new Date(activity.startTime), offset)
       const endLocal = toLocalTime(new Date(activity.endTime), offset)
 
+      const categoryTags = (activity.categories || []).map(name => ({
+        name,
+        icon: CATEGORY_ICONS[name] || '📌'
+      }))
+
       this.setData({
         statusText: STATUS_TEXT[status],
         statusTagClass: STATUS_TAG_CLASS[status],
         canQuickSignup: status === 'open',
         formattedDate: formatDate(startLocal),
-        formattedTime: `${formatTimeShort(startLocal)} - ${formatTimeShort(endLocal)}`
+        formattedTime: `${formatTimeShort(startLocal)} - ${formatTimeShort(endLocal)}`,
+        categoryTags
       })
     }
   },

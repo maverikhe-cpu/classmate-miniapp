@@ -4,6 +4,12 @@
       <text class="card-title">{{activity.title}}</text>
       <view class="tag {{statusTagClass}}">{{statusText}}</view>
     </view>
+    <view class="card-categories" wx:if="{{categoryTags.length > 0}}">
+      <view class="card-category" wx:for="{{categoryTags}}" wx:key="name">
+        <text class="category-icon">{{item.icon}}</text>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
     <view class="card-meta">
       <text class="meta-item">{{formattedDate}}</text>
       <text class="meta-dot">·</text>

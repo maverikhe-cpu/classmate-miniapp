@@ -1,4 +1,5 @@
 const { getAllCountries, getCitiesByCountry, getCountryCode, getUtcOffset, formatOffsetStr } = require('../../utils/locations')
+const { CATEGORIES } = require('../../utils/categories')
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
@@ -30,6 +31,8 @@ Page({
     deadlineDate: '',
     deadlineTime: '',
     deadlineDisplay: '',
+    categoryItems: CATEGORIES.map(name => ({ name, active: false })),
+    selectedCategories: [],
     showStartCalendar: false,
     showEndCalendar: false,
     showDeadlineCalendar: false,
@@ -43,6 +46,16 @@ Page({
   onTitleInput(e) { this.setData({ title: e.detail.value }) },
   onLocationInput(e) { this.setData({ location: e.detail.value }) },
   onDescriptionInput(e) { this.setData({ description: e.detail.value }) },
+
+  toggleCategory(e) {
+    const idx = e.currentTarget.dataset.index
+    const item = this.data.categoryItems[idx]
+    const newItem = { name: item.name, active: !item.active }
+    const newItems = [...this.data.categoryItems]
+    newItems[idx] = newItem
+    const selectedCategories = newItems.filter(c => c.active).map(c => c.name)
+    this.setData({ categoryItems: newItems, selectedCategories })
+  },
 
   onCountryChange(e) {
     const index = parseInt(e.detail.value)
@@ -207,7 +220,8 @@ Page({
     const {
       title, description, location, country, city,
       startDate, startTime, endDate, endTime,
-      hasLimit, maxMembers, deadlineDate, deadlineTime
+      hasLimit, maxMembers, deadlineDate, deadlineTime,
+      selectedCategories
     } = this.data
 
     const offset = getUtcOffset(country, city)
@@ -224,6 +238,7 @@ Page({
           countryCode: getCountryCode(country),
           city,
           timezoneOffset: offset,
+          categories: selectedCategories,
           startTime: `${startDate}T${startTime}:00${offsetStr}`,
           endTime: `${endDate}T${endTime}:00${offsetStr}`,
           signupDeadline: (deadlineDate && deadlineTime)

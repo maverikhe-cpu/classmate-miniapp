@@ -7,7 +7,7 @@ const db = cloud.database()
 exports.main = async (event) => {
   const wxContext = cloud.getWXContext()
   const openid = wxContext.OPENID
-  const { activityId, title, description, location, country, countryCode, city, timezoneOffset, startTime, endTime, signupDeadline, maxMembers } = event
+  const { activityId, title, description, location, country, countryCode, city, timezoneOffset, categories, startTime, endTime, signupDeadline, maxMembers } = event
 
   if (!activityId) {
     return { success: false, error: '缺少活动ID' }
@@ -45,6 +45,7 @@ exports.main = async (event) => {
         countryCode,
         city,
         timezoneOffset: timezoneOffset || 0,
+        categories: categories || [],
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         signupDeadline: signupDeadline ? new Date(signupDeadline) : null,
