@@ -153,6 +153,10 @@
   border-bottom: 1rpx solid #F3F4F6;
 }
 
+.form-input-disabled {
+  color: #9CA3AF;
+}
+
 .picker-row {
   display: flex;
   flex-direction: row;
@@ -222,6 +226,24 @@
   display: block;
   font-size: 26rpx;
   color: #9CA3AF;
+}
+
+.confirm-info-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 8rpx;
+}
+
+.confirm-label {
+  font-size: 24rpx;
+  color: #9CA3AF;
+  margin-right: 12rpx;
+}
+
+.confirm-value {
+  font-size: 24rpx;
+  color: #6B7280;
 }
 
 .btn-complete {

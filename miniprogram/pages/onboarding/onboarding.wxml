@@ -37,18 +37,18 @@
     </view>
   </view>
 
-  <!-- Step 2: 完善资料 -->
+  <!-- Step 2: 确认并编辑个人信息 -->
   <view class="step-container" wx:if="{{step === 2}}">
     <view class="step-header">
       <view class="back-btn" bindtap="goBack">‹ 返回</view>
       <text class="step-badge">2/3</text>
-      <text class="step-title">完善个人资料</text>
-      <text class="step-desc">让大家认识你</text>
+      <text class="step-title">确认个人信息</text>
+      <text class="step-desc">请检查并更新你的信息</text>
     </view>
 
     <view class="match-info">
       <text class="match-icon">✓</text>
-      <text class="match-text">已验证：{{matchResult.nickName}}（{{matchResult.studentId}}）</text>
+      <text class="match-text">已验证：{{editName}}（{{matchResult.studentId}}）</text>
     </view>
 
     <view class="avatar-section">
@@ -64,46 +64,44 @@
 
     <view class="form-group">
       <text class="form-label">姓名</text>
-      <input
-        class="form-input"
-        type="nickname"
-        value="{{editName}}"
-        disabled="{{true}}"
-      />
+      <input class="form-input form-input-disabled" value="{{editName}}" disabled="{{true}}" />
     </view>
 
     <view class="form-group">
       <text class="form-label">个性签名</text>
-      <input
-        class="form-input"
-        value="{{editBio}}"
-        bindinput="onEditBioInput"
-        maxlength="50"
-        placeholder="写点什么吧..."
-      />
+      <input class="form-input" value="{{editBio}}" bindinput="onEditBioInput" maxlength="50" placeholder="写点什么吧..." />
     </view>
 
     <view class="form-group">
       <text class="form-label">所在地区</text>
       <view class="picker-row">
-        <picker
-          mode="selector"
-          range="{{countries}}"
-          bindchange="onEditCountryChange"
-          value="{{editCountryIndex}}"
-        >
+        <picker mode="selector" range="{{countries}}" bindchange="onEditCountryChange" value="{{editCountryIndex}}">
           <view class="picker-value">{{editCountry || '选择国家'}}</view>
         </picker>
-        <picker
-          mode="selector"
-          range="{{editCities}}"
-          bindchange="onEditCityChange"
-          value="{{editCityIndex}}"
-          disabled="{{editCities.length === 0}}"
-        >
+        <picker mode="selector" range="{{editCities}}" bindchange="onEditCityChange" value="{{editCityIndex}}" disabled="{{editCities.length === 0}}">
           <view class="picker-value {{editCities.length === 0 ? 'picker-disabled' : ''}}">{{editCity || '选择城市'}}</view>
         </picker>
       </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">微信号</text>
+      <input class="form-input" value="{{editWechat}}" bindinput="onEditWechatInput" maxlength="50" placeholder="选填" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">电子邮箱</text>
+      <input class="form-input" value="{{editEmail}}" bindinput="onEditEmailInput" maxlength="80" placeholder="选填" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">电话号码</text>
+      <input class="form-input" value="{{editPhone}}" bindinput="onEditPhoneInput" maxlength="30" placeholder="选填" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">详细地址</text>
+      <input class="form-input" value="{{editAddress}}" bindinput="onEditAddressInput" maxlength="200" placeholder="选填" />
     </view>
 
     <button class="btn-primary btn-next" bindtap="goToStep3">下一步</button>
@@ -126,9 +124,26 @@
       />
       <text class="confirm-name">{{editName}}</text>
       <text class="confirm-bio" wx:if="{{editBio}}">{{editBio}}</text>
-      <text class="confirm-location" wx:if="{{editCountry}}">
-        {{editCountry}}{{editCity ? ' · ' + editCity : ''}}
-      </text>
+      <view class="confirm-info-row" wx:if="{{editCountry}}">
+        <text class="confirm-label">地区</text>
+        <text class="confirm-value">{{editCountry}}{{editCity ? ' · ' + editCity : ''}}</text>
+      </view>
+      <view class="confirm-info-row" wx:if="{{editWechat}}">
+        <text class="confirm-label">微信</text>
+        <text class="confirm-value">{{editWechat}}</text>
+      </view>
+      <view class="confirm-info-row" wx:if="{{editEmail}}">
+        <text class="confirm-label">邮箱</text>
+        <text class="confirm-value">{{editEmail}}</text>
+      </view>
+      <view class="confirm-info-row" wx:if="{{editPhone}}">
+        <text class="confirm-label">电话</text>
+        <text class="confirm-value">{{editPhone}}</text>
+      </view>
+      <view class="confirm-info-row" wx:if="{{editAddress}}">
+        <text class="confirm-label">地址</text>
+        <text class="confirm-value">{{editAddress}}</text>
+      </view>
     </view>
 
     <button

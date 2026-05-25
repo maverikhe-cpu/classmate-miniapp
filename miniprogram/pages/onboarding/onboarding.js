@@ -8,13 +8,18 @@ Page({
     inputName: '',
     errorMessage: '',
     countries: [],
+    // editable fields
+    editName: '',
+    editBio: '',
     editCountry: '',
     editCountryIndex: -1,
     editCities: [],
     editCity: '',
     editCityIndex: -1,
-    editName: '',
-    editBio: '',
+    editWechat: '',
+    editEmail: '',
+    editPhone: '',
+    editAddress: '',
     avatarUrl: '',
     submitting: false
   },
@@ -63,28 +68,28 @@ Page({
 
       const selected = unbound[0]
 
+      const countries = this.data.countries
+      const countryIndex = selected.country ? countries.indexOf(selected.country) : -1
+      const cities = countryIndex >= 0 ? getCitiesByCountry(selected.country) : []
+      const cityIndex = selected.city ? cities.indexOf(selected.city) : -1
+
       this.setData({
         matchResult: selected,
         editName: selected.nickName,
+        editBio: selected.bio || '',
+        editCountry: selected.country || '',
+        editCountryIndex: countryIndex,
+        editCities: cities,
+        editCity: selected.city || '',
+        editCityIndex: cityIndex,
+        editWechat: selected.wechat || '',
+        editEmail: selected.email || '',
+        editPhone: selected.phone || '',
+        editAddress: selected.address || '',
+        avatarUrl: selected.avatarUrl || '',
         errorMessage: '',
         step: 2
       })
-
-      if (selected.country) {
-        const countries = this.data.countries
-        const countryIndex = countries.indexOf(selected.country)
-        if (countryIndex >= 0) {
-          const cities = getCitiesByCountry(selected.country)
-          const cityIndex = selected.city ? cities.indexOf(selected.city) : -1
-          this.setData({
-            editCountry: selected.country,
-            editCountryIndex: countryIndex,
-            editCities: cities,
-            editCity: selected.city || '',
-            editCityIndex: cityIndex
-          })
-        }
-      }
     } catch (err) {
       console.error('searchAndBind error:', err)
       this.setData({ errorMessage: '网络错误，请重试' })
@@ -99,49 +104,38 @@ Page({
     }
   },
 
-  onEditBioInput(e) {
-    this.setData({ editBio: e.detail.value })
-  },
+  onEditBioInput(e) { this.setData({ editBio: e.detail.value }) },
+  onEditWechatInput(e) { this.setData({ editWechat: e.detail.value }) },
+  onEditEmailInput(e) { this.setData({ editEmail: e.detail.value }) },
+  onEditPhoneInput(e) { this.setData({ editPhone: e.detail.value }) },
+  onEditAddressInput(e) { this.setData({ editAddress: e.detail.value }) },
 
   onEditCountryChange(e) {
     const index = parseInt(e.detail.value)
     const country = this.data.countries[index]
     const cities = getCitiesByCountry(country)
-
-    this.setData({
-      editCountry: country,
-      editCountryIndex: index,
-      editCities: cities,
-      editCity: '',
-      editCityIndex: -1
-    })
+    this.setData({ editCountry: country, editCountryIndex: index, editCities: cities, editCity: '', editCityIndex: -1 })
   },
 
   onEditCityChange(e) {
     const index = parseInt(e.detail.value)
-    this.setData({
-      editCity: this.data.editCities[index],
-      editCityIndex: index
-    })
+    this.setData({ editCity: this.data.editCities[index], editCityIndex: index })
   },
 
   goBack() {
-    const step = this.data.step
-    if (step === 2) {
+    if (this.data.step === 2) {
       this.setData({ step: 1, matchResult: null })
-    } else if (step === 3) {
+    } else if (this.data.step === 3) {
       this.setData({ step: 2 })
     }
   },
 
   goToStep3() {
-    const { editCountry, editCity } = this.data
-
+    const { editCountry } = this.data
     if (!editCountry) {
       wx.showToast({ title: '请选择所在地区', icon: 'none' })
       return
     }
-
     this.setData({ step: 3 })
   },
 
@@ -150,12 +144,8 @@ Page({
     this.setData({ submitting: true })
 
     const {
-      matchResult,
-      editName,
-      editBio,
-      editCountry,
-      editCity,
-      avatarUrl
+      matchResult, editName, editBio, editCountry, editCity,
+      editWechat, editEmail, editPhone, editAddress, avatarUrl
     } = this.data
 
     try {
@@ -163,10 +153,7 @@ Page({
 
       if (avatarUrl && !avatarUrl.startsWith('cloud://')) {
         const cloudPath = `avatars/${app.globalData.openid}_${Date.now()}.jpg`
-        const uploadRes = await wx.cloud.uploadFile({
-          cloudPath,
-          filePath: avatarUrl
-        })
+        const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: avatarUrl })
         finalAvatarUrl = uploadRes.fileID
       }
 
@@ -178,17 +165,18 @@ Page({
           bio: editBio.trim(),
           country: editCountry,
           city: editCity,
-          avatarUrl: finalAvatarUrl
+          avatarUrl: finalAvatarUrl,
+          wechat: editWechat.trim(),
+          email: editEmail.trim(),
+          phone: editPhone.trim(),
+          address: editAddress.trim()
         }
       })
 
       if (res.result.success) {
         app.markOnboarded(res.result.userInfo)
-
         wx.showToast({ title: '欢迎加入！', icon: 'success' })
-        setTimeout(() => {
-          wx.switchTab({ url: '/pages/index/index' })
-        }, 1000)
+        setTimeout(() => wx.switchTab({ url: '/pages/index/index' }), 1000)
       } else {
         wx.showToast({ title: res.result.error || '绑定失败', icon: 'none' })
       }

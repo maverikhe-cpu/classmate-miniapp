@@ -13,8 +13,15 @@ exports.main = async (event, context) => {
       nickName: c.nickName,
       studentId: c.studentId || '',
       group: c.group || 0,
-      city: c.city || '',
+      bio: c.bio || '',
+      avatarUrl: c.avatarUrl || '',
       country: c.country || '',
+      countryCode: c.countryCode || '',
+      city: c.city || '',
+      wechat: c.wechat || '',
+      email: c.email || '',
+      phone: c.phone || '',
+      address: c.address || '',
       registered: c.registered || false,
       bound: c.bound || false
     }))
@@ -39,7 +46,7 @@ async function fetchAll(collection, query) {
     tasks.push(
       db.collection(collection)
         .where(query)
-        .field({ nickName: true, studentId: true, group: true, city: true, country: true, registered: true, bound: true })
+        .field({ nickName: true, studentId: true, group: true, bio: true, avatarUrl: true, city: true, country: true, countryCode: true, wechat: true, email: true, phone: true, address: true, registered: true, bound: true })
         .skip(i * MAX_LIMIT)
         .limit(MAX_LIMIT)
         .get()
