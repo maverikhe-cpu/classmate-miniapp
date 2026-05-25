@@ -11,57 +11,64 @@ App({
 
     this.globalData = {
       userInfo: null,
-      openid: null
+      openid: null,
+      onboarded: null,
+      _loginPromise: null
     }
 
-    this.getOpenId()
+    this._login()
+  },
+
+  _login() {
+    if (this.globalData._loginPromise) {
+      return this.globalData._loginPromise
+    }
+
+    this.globalData._loginPromise = wx.cloud.callFunction({
+      name: 'login'
+    }).then(res => {
+      const openid = res.result.openid
+      this.globalData.openid = openid
+      this.globalData.onboarded = res.result.onboarded
+
+      if (res.result.userInfo) {
+        this.globalData.userInfo = res.result.userInfo
+      }
+
+      return res.result
+    })
+
+    return this.globalData._loginPromise
   },
 
   getOpenId() {
     if (this.globalData.openid) {
       return Promise.resolve(this.globalData.openid)
     }
+    return this._login().then(r => r.openid)
+  },
 
-    return wx.cloud.callFunction({
-      name: 'login'
-    }).then(res => {
-      const openid = res.result.openid
-      this.globalData.openid = openid
+  ensureOnboarded() {
+    if (this.globalData.onboarded === true) {
+      return Promise.resolve(true)
+    }
 
-      if (res.result.onboarded === false) {
-        wx.navigateTo({
-          url: '/pages/onboarding/onboarding',
-          success: () => {
-            const pages = getCurrentPages()
-            if (pages.length > 1) {
-              wx.navigateBack({ delta: pages.length - 1 })
-            }
-          }
-        })
+    return this._login().then(result => {
+      if (result.onboarded) {
+        return true
       }
 
-      return openid
+      return new Promise((resolve) => {
+        wx.redirectTo({
+          url: '/pages/onboarding/onboarding',
+          complete: () => resolve(false)
+        })
+      })
     })
   },
 
-  getUserInfo() {
-    if (this.globalData.userInfo) {
-      return Promise.resolve(this.globalData.userInfo)
-    }
-
-    return wx.cloud.callFunction({
-      name: 'login'
-    }).then(res => {
-      const userInfo = res.result.userInfo
-      this.globalData.userInfo = userInfo
-
-      if (res.result.onboarded === false) {
-        wx.navigateTo({
-          url: '/pages/onboarding/onboarding'
-        })
-      }
-
-      return userInfo
-    })
+  markOnboarded(userInfo) {
+    this.globalData.onboarded = true
+    this.globalData.userInfo = userInfo
   }
 })

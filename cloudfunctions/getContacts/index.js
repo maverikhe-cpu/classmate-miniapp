@@ -28,7 +28,7 @@ exports.main = async (event) => {
       })
     ])
 
-    const users = usersResult
+    const users = usersResult.filter(u => u.onboarded !== false)
     const classmateMap = {}
     classmatesResult.forEach(c => {
       classmateMap[(c.nickName || '').trim()] = c

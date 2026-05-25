@@ -25,10 +25,13 @@ Page({
   },
 
   onLoad() {
-    this.loadContacts()
+    app.ensureOnboarded().then(ok => {
+      if (ok) this.loadContacts()
+    })
   },
 
   onShow() {
+    if (!app.globalData.onboarded) return
     if (this.data.allUsers.length > 0) return
     this.loadContacts()
   },

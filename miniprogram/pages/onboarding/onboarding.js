@@ -183,8 +183,7 @@ Page({
       })
 
       if (res.result.success) {
-        app.globalData.userInfo = res.result.userInfo
-        app.globalData.openid = res.result.openid
+        app.markOnboarded(res.result.userInfo)
 
         wx.showToast({ title: '欢迎加入！', icon: 'success' })
         setTimeout(() => {

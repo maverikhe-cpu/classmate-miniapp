@@ -16,39 +16,16 @@ exports.main = async (event, context) => {
 
     if (existingUser.length > 0) {
       const user = existingUser[0]
-      if (event.userInfo) {
-        await usersCollection.doc(user._id).update({
-          data: {
-            nickName: event.userInfo.nickName || user.nickName,
-            avatarUrl: event.userInfo.avatarUrl || user.avatarUrl,
-            updatedAt: db.serverDate()
-          }
-        })
-      }
-
       return {
         openid,
         userInfo: { ...user, _openid: openid },
-        onboarded: !!user.nickName && user.nickName !== '同学'
+        onboarded: !!user.onboarded
       }
     }
 
-    const newUser = {
-      _openid: openid,
-      nickName: '同学',
-      avatarUrl: '',
-      gender: 0,
-      phone: '',
-      bio: '',
-      createdAt: db.serverDate(),
-      updatedAt: db.serverDate()
-    }
-
-    const result = await usersCollection.add({ data: newUser })
-
     return {
       openid,
-      userInfo: { ...newUser, _id: result._id },
+      userInfo: null,
       onboarded: false
     }
   } catch (err) {

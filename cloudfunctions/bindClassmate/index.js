@@ -26,13 +26,11 @@ exports.main = async (event, context) => {
       .where({ _openid: openid })
       .get()
 
-    if (existingUsers.length === 0) {
-      return { success: false, error: '用户不存在' }
-    }
-
-    const user = existingUsers[0]
-    if (user.nickName !== '同学' && user.classmateId) {
-      return { success: false, error: '你已经绑定过身份' }
+    if (existingUsers.length > 0) {
+      const user = existingUsers[0]
+      if (user.onboarded && user.classmateId) {
+        return { success: false, error: '你已经绑定过身份' }
+      }
     }
 
     if (classmateId) {
@@ -55,7 +53,8 @@ exports.main = async (event, context) => {
         }
       })
 
-      const updateData = {
+      const userData = {
+        _openid: openid,
         nickName,
         classmateId,
         bio: bio || classmate.bio || '',
@@ -66,34 +65,45 @@ exports.main = async (event, context) => {
         studentId: classmate.studentId || '',
         group: classmate.group || 0,
         onboarded: true,
+        createdAt: db.serverDate(),
         updatedAt: db.serverDate()
       }
 
-      await db.collection('users').doc(user._id).update({ data: updateData })
+      if (existingUsers.length > 0) {
+        await db.collection('users').doc(existingUsers[0]._id).update({ data: userData })
+      } else {
+        await db.collection('users').add({ data: userData })
+      }
 
       return {
         success: true,
         openid,
-        userInfo: { ...user, ...updateData }
+        userInfo: userData
       }
     }
 
-    const updateData = {
+    const userData = {
+      _openid: openid,
       nickName,
       bio: bio || '',
       avatarUrl: avatarUrl || '',
       country: country || '',
       city: city || '',
       onboarded: true,
+      createdAt: db.serverDate(),
       updatedAt: db.serverDate()
     }
 
-    await db.collection('users').doc(user._id).update({ data: updateData })
+    if (existingUsers.length > 0) {
+      await db.collection('users').doc(existingUsers[0]._id).update({ data: userData })
+    } else {
+      await db.collection('users').add({ data: userData })
+    }
 
     return {
       success: true,
       openid,
-      userInfo: { ...user, ...updateData }
+      userInfo: userData
     }
   } catch (err) {
     console.error('bindClassmate error:', err)

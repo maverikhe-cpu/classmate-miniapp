@@ -18,7 +18,9 @@ Page({
 
   onLoad() {
     this.setData({ countries: getAllCountries() })
-    this.loadActivities()
+    app.ensureOnboarded().then(ok => {
+      if (ok) this.loadActivities()
+    })
   },
 
   onPullDownRefresh() {
@@ -131,6 +133,7 @@ Page({
   },
 
   onShow() {
+    if (!app.globalData.onboarded) return
     if (this._loaded) {
       this.setData({ page: 0, activities: [], hasMore: true })
       this.loadActivities()

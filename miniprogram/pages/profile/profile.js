@@ -24,10 +24,13 @@ Page({
 
   onLoad() {
     this.setData({ countries: getAllCountries() })
-    this.loadProfile()
+    app.ensureOnboarded().then(ok => {
+      if (ok) this.loadProfile()
+    })
   },
 
   onShow() {
+    if (!app.globalData.onboarded) return
     this.loadProfile()
   },
 
