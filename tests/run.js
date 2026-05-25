@@ -2,6 +2,7 @@ const { getMiniProgram, closeMiniProgram, formatResult, log } = require('./helpe
 
 const specs = {
   activity: () => require('./specs/activity.test'),
+  album: () => require('./specs/album.test'),
   profile: () => require('./specs/profile.test'),
   contacts: () => require('./specs/contacts.test'),
   onboarding: () => require('./specs/onboarding.test')

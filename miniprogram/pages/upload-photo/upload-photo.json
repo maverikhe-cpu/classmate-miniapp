@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "fuzzy-date-picker": "/components/fuzzy-date-picker/fuzzy-date-picker"
+  },
+  "navigationBarTitleText": "上传照片"
+}

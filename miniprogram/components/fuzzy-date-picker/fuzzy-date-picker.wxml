@@ -1,0 +1,34 @@
+<view class="picker">
+  <view class="picker-label">拍摄时间</view>
+  <view class="type-row">
+    <view
+      class="type-btn {{selectedDateType === item.value ? 'type-active' : ''}}"
+      wx:for="{{dateTypes}}"
+      wx:key="value"
+      bindtap="onDateTypeTap"
+      data-type="{{item.value}}"
+    >{{item.label}}</view>
+  </view>
+
+  <view class="field-row" wx:if="{{selectedDateType === 'exact' || selectedDateType === 'year' || selectedDateType === 'season'}}">
+    <picker mode="selector" range="{{years}}" bindchange="onYearChange" value="{{selectedYear}}">
+      <view class="field-value">{{years[selectedYear] || '选择年份'}}年</view>
+    </picker>
+  </view>
+
+  <view class="field-row" wx:if="{{selectedDateType === 'season'}}">
+    <picker mode="selector" range="{{seasons}}" bindchange="onSeasonChange" value="{{selectedSeason}}">
+      <view class="field-value">{{seasons[selectedSeason] || '选择季节'}}</view>
+    </picker>
+  </view>
+
+  <view class="field-row" wx:if="{{selectedDateType === 'era'}}">
+    <picker mode="selector" range="{{eras}}" bindchange="onEraChange" value="{{selectedEra}}">
+      <view class="field-value">{{eras[selectedEra] || '选择时期'}}</view>
+    </picker>
+  </view>
+
+  <view class="date-preview" wx:if="{{selectedDateType !== 'unknown'}}">
+    <text class="preview-text">{{displayText}}</text>
+  </view>
+</view>

@@ -1,0 +1,86 @@
+.photo-card {
+  display: flex;
+  flex-direction: row;
+  padding: 20rpx;
+  gap: 20rpx;
+}
+
+.card-thumb {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 12rpx;
+  background-color: #F3F4F6;
+  flex-shrink: 0;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.card-caption {
+  font-size: 28rpx;
+  color: #1F2937;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.card-tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+
+.photo-tag {
+  font-size: 20rpx;
+  color: #4F46E5;
+  background-color: #EEF2FF;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.card-uploader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.uploader-name {
+  font-size: 22rpx;
+  color: #6B7280;
+}
+
+.card-date {
+  font-size: 22rpx;
+  color: #9CA3AF;
+}
+
+.card-stats {
+  display: flex;
+  flex-direction: row;
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+
+.stat {
+  font-size: 22rpx;
+  color: #6B7280;
+}

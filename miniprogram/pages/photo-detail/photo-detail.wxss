@@ -1,0 +1,255 @@
+.page {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  padding-bottom: 120rpx;
+}
+
+.photo-full {
+  width: 100%;
+  display: block;
+}
+
+.info-section {
+  margin: 16rpx 24rpx;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 12rpx;
+  gap: 12rpx;
+}
+
+.uploader-name {
+  font-size: 28rpx;
+  color: #1F2937;
+  font-weight: 500;
+  flex: 1;
+}
+
+.photo-date {
+  font-size: 24rpx;
+  color: #9CA3AF;
+}
+
+.caption-text {
+  font-size: 30rpx;
+  color: #1F2937;
+  line-height: 1.6;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.tag-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.photo-tag {
+  font-size: 20rpx;
+  color: #4F46E5;
+  background-color: #EEF2FF;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+/* Actions */
+.actions-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  padding: 20rpx 24rpx;
+  background-color: #ffffff;
+  margin: 0 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+  background: none;
+  border: none;
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
+  color: #6B7280;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-icon {
+  font-size: 36rpx;
+}
+
+.action-count {
+  font-size: 22rpx;
+  color: #6B7280;
+}
+
+.action-label {
+  font-size: 22rpx;
+  color: #6B7280;
+}
+
+/* Date suggestions */
+.suggestion-item {
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-name {
+  font-size: 24rpx;
+  color: #4F46E5;
+  font-weight: 500;
+  margin-right: 12rpx;
+}
+
+.suggestion-text {
+  font-size: 26rpx;
+  color: #374151;
+}
+
+/* Comments */
+.comment-item {
+  display: flex;
+  flex-direction: row;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.comment-body {
+  flex: 1;
+}
+
+.comment-name {
+  font-size: 24rpx;
+  color: #4F46E5;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.comment-content {
+  font-size: 28rpx;
+  color: #1F2937;
+  line-height: 1.5;
+  display: block;
+}
+
+.comment-time {
+  font-size: 22rpx;
+  color: #9CA3AF;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.empty-hint {
+  padding: 20rpx 0;
+}
+
+/* Comment input bar */
+.comment-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
+  background-color: #ffffff;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  gap: 16rpx;
+}
+
+.comment-input {
+  flex: 1;
+  background-color: #F3F4F6;
+  border-radius: 32rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  color: #1F2937;
+}
+
+.send-btn {
+  padding: 12rpx 24rpx;
+  background-color: #4F46E5;
+  border-radius: 24rpx;
+}
+
+.send-text {
+  font-size: 26rpx;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Date suggestion sheet */
+.sheet-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet-panel {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 32rpx 24rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}
+
+.sheet-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1F2937;
+  display: block;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.sheet-input {
+  font-size: 28rpx;
+  color: #1F2937;
+  background: #F9FAFB;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  width: 100%;
+  min-height: 120rpx;
+  margin-bottom: 24rpx;
+}
+
+.sheet-btn {
+  width: 100%;
+}

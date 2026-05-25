@@ -1,0 +1,43 @@
+<view class="page">
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="搜索备注、标签、上传者"
+      value="{{keyword}}"
+      bindconfirm="onSearch"
+      confirm-type="search"
+    />
+  </view>
+
+  <scroll-view class="tag-filter" scroll-x enhanced show-scrollbar="{{false}}">
+    <view
+      class="tag-pill {{selectedTag === item ? 'tag-pill-active' : ''}}"
+      wx:for="{{tagList}}"
+      wx:key="*this"
+      bindtap="onTagTap"
+      data-tag="{{item}}"
+    >{{item}}</view>
+  </scroll-view>
+
+  <view class="photo-list" wx:if="{{photos.length > 0}}">
+    <photo-card
+      wx:for="{{photos}}"
+      wx:key="_id"
+      photo="{{item}}"
+    />
+  </view>
+
+  <view class="empty-state" wx:elif="{{!loading}}">
+    <text class="empty-icon">📷</text>
+    <text class="empty-text">还没有照片</text>
+    <text class="empty-hint">点击 + 上传第一张回忆吧</text>
+  </view>
+
+  <view class="loading-more" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="fab" bindtap="goUpload">
+    <text class="fab-text">+</text>
+  </view>
+</view>

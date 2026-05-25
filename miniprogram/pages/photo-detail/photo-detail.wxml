@@ -1,0 +1,92 @@
+<view class="page" wx:if="{{photo}}">
+  <image class="photo-full" src="{{photo.fileID}}" mode="widthFix" bindtap="previewImage" />
+
+  <view class="info-section card">
+    <view class="info-row">
+      <image class="avatar-small" src="{{photo.uploaderAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+      <text class="uploader-name">{{photo.uploaderName}}</text>
+      <text class="photo-date">{{displayDate}}</text>
+    </view>
+    <text class="caption-text" wx:if="{{photo.caption}}">{{photo.caption}}</text>
+    <view class="tag-row" wx:if="{{tagList.length > 0}}">
+      <text class="photo-tag" wx:for="{{tagList}}" wx:key="name">{{item.icon}} {{item.name}}</text>
+    </view>
+  </view>
+
+  <view class="actions-row">
+    <view class="action-btn" bindtap="toggleLike">
+      <text class="action-icon">{{isLiked ? '❤️' : '🤍'}}</text>
+      <text class="action-count">{{photo.likeCount || 0}}</text>
+    </view>
+    <view class="action-btn" bindtap="showDateSuggestSheet">
+      <text class="action-icon">📅</text>
+      <text class="action-label">帮忙回忆</text>
+    </view>
+    <button class="action-btn" open-type="share">
+      <text class="action-icon">↗</text>
+      <text class="action-label">分享</text>
+    </button>
+    <view class="action-btn" wx:if="{{isUploader}}" bindtap="deletePhoto">
+      <text class="action-icon">🗑️</text>
+      <text class="action-label">删除</text>
+    </view>
+  </view>
+
+  <!-- Date suggestions -->
+  <view class="card" wx:if="{{photo.dateSuggestions.length > 0}}">
+    <text class="section-title">时间回忆 ({{photo.dateSuggestions.length}})</text>
+    <view class="suggestion-item" wx:for="{{photo.dateSuggestions}}" wx:key="openid">
+      <text class="suggestion-name">{{item.name}}</text>
+      <text class="suggestion-text">{{item.suggestion}}</text>
+    </view>
+  </view>
+
+  <!-- Comments -->
+  <view class="card">
+    <text class="section-title">评论 ({{photo.commentCount || 0}})</text>
+    <view wx:if="{{comments.length > 0}}">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="_id">
+        <image class="comment-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" />
+        <view class="comment-body">
+          <text class="comment-name">{{item.name}}</text>
+          <text class="comment-content">{{item.content}}</text>
+          <text class="comment-time">{{item.formattedTime}}</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-hint">
+      <text class="empty-text">还没有评论</text>
+    </view>
+  </view>
+
+  <!-- Comment input bar -->
+  <view class="comment-bar">
+    <input
+      class="comment-input"
+      placeholder="写评论..."
+      value="{{commentText}}"
+      bindinput="onCommentInput"
+      bindconfirm="submitComment"
+      confirm-type="send"
+    />
+    <view class="send-btn" bindtap="submitComment">
+      <text class="send-text">发送</text>
+    </view>
+  </view>
+
+  <!-- Date suggestion sheet -->
+  <view class="sheet-mask" wx:if="{{showDateSheet}}" bindtap="hideDateSheet">
+    <view class="sheet-panel" catchtap="">
+      <text class="sheet-title">帮忙回忆时间</text>
+      <textarea
+        class="sheet-input"
+        placeholder="你记得这是什么时候拍的吗？"
+        value="{{dateSuggestion}}"
+        bindinput="onDateSuggestionInput"
+        maxlength="200"
+        auto-height
+      />
+      <button class="btn-primary sheet-btn" bindtap="submitDateSuggestion">提交</button>
+    </view>
+  </view>
+</view>

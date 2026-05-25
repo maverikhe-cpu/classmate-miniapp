@@ -2,11 +2,14 @@
   "pages": [
     "pages/index/index",
     "pages/contacts/contacts",
+    "pages/album/album",
     "pages/activity-detail/activity-detail",
     "pages/create-activity/create-activity",
     "pages/profile/profile",
     "pages/onboarding/onboarding",
-    "pages/edit-activity/edit-activity"
+    "pages/edit-activity/edit-activity",
+    "pages/upload-photo/upload-photo",
+    "pages/photo-detail/photo-detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -26,6 +29,12 @@
         "text": "活动",
         "iconPath": "images/tab-activity.png",
         "selectedIconPath": "images/tab-activity-active.png"
+      },
+      {
+        "pagePath": "pages/album/album",
+        "text": "回忆",
+        "iconPath": "images/tab-album.png",
+        "selectedIconPath": "images/tab-album-active.png"
       },
       {
         "pagePath": "pages/contacts/contacts",

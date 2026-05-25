@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "photo-card": "/components/photo-card/photo-card"
+  },
+  "navigationBarTitleText": "回忆"
+}
