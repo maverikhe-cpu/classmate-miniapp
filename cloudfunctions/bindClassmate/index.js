@@ -64,6 +64,10 @@ exports.main = async (event, context) => {
         city: city || classmate.city || '',
         studentId: classmate.studentId || '',
         group: classmate.group || 0,
+        wechat: classmate.wechat || '',
+        email: classmate.email || '',
+        phone: classmate.phone || '',
+        address: classmate.address || '',
         onboarded: true,
         createdAt: db.serverDate(),
         updatedAt: db.serverDate()
