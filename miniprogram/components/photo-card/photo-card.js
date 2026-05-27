@@ -27,7 +27,11 @@ Component({
       const photo = this.properties.photo
       if (photo && photo._id) {
         wx.navigateTo({
-          url: `/pages/photo-detail/photo-detail?id=${photo._id}`
+          url: `/pages/photo-detail/photo-detail?id=${photo._id}`,
+          events: {},
+          success: (res) => {
+            res.eventChannel.emit('photoData', photo)
+          }
         })
       }
     }

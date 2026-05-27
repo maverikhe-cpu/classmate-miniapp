@@ -11,6 +11,8 @@ exports.main = async (event) => {
   const { page = 0, pageSize = 20, tag, keyword } = event
 
   try {
+    try { await db.createCollection('classPhotos') } catch (_) { /* already exists */ }
+
     let query = db.collection('classPhotos')
 
     const conditions = {}
@@ -52,9 +54,27 @@ exports.main = async (event) => {
       isLiked: (p.likedBy || []).includes(openid)
     }))
 
+    // Convert fileIDs to temp URLs so all users can view images
+    const fileIDs = result.map(p => p.fileID).filter(Boolean)
+    let urlMap = {}
+    if (fileIDs.length > 0) {
+      try {
+        const urlRes = await cloud.getTempFileURL({ fileList: fileIDs })
+        if (urlRes.fileList) {
+          urlRes.fileList.forEach(f => { urlMap[f.fileID] = f.tempFileURL })
+        }
+      } catch (_) {}
+    }
+
+    const finalResult = result.map(p => ({
+      ...p,
+      fileID: (p.fileID && urlMap[p.fileID]) || p.fileID,
+      rawFileID: p.fileID
+    }))
+
     return {
       success: true,
-      data: result,
+      data: finalResult,
       total,
       hasMore: (page + 1) * pageSize < total
     }

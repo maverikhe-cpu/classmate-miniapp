@@ -18,6 +18,8 @@ exports.main = async (event) => {
   }
 
   try {
+    try { await db.createCollection('classPhotos') } catch (_) { /* already exists */ }
+
     const { data: users } = await db.collection('users')
       .where({ _openid: openid })
       .get()

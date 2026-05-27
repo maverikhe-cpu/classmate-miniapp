@@ -29,25 +29,38 @@ exports.main = async (event) => {
     ])
 
     const users = usersResult.filter(u => u.onboarded !== false)
-    const classmateMap = {}
+
+    // Build name → classmates lookup (allow duplicates by storing array)
+    const classmatesByName = {}
     classmatesResult.forEach(c => {
-      classmateMap[(c.nickName || '').trim()] = c
+      const key = (c.nickName || '').trim()
+      if (!classmatesByName[key]) classmatesByName[key] = []
+      classmatesByName[key].push(c)
     })
 
+    // Track which classmates have been matched to a user
+    const matchedClassmateIds = new Set()
+
     const mergedUsers = users.map(u => {
-      const matched = classmateMap[(u.nickName || '').trim()]
-      if (matched) {
-        return {
-          ...u,
-          studentId: u.studentId || matched.studentId || '',
-          group: u.group || matched.group || 0
+      const nameKey = (u.nickName || '').trim()
+      const candidates = classmatesByName[nameKey]
+      if (candidates && candidates.length > 0) {
+        // Find an unmatched classmate with this name
+        const matched = candidates.find(c => !matchedClassmateIds.has(c._id))
+        if (matched) {
+          matchedClassmateIds.add(matched._id)
+          return {
+            ...u,
+            studentId: u.studentId || matched.studentId || '',
+            group: u.group || matched.group || 0
+          }
         }
       }
       return u
     })
 
-    const userNames = new Set(mergedUsers.map(u => (u.nickName || '').trim()))
-    const unboundClassmates = classmatesResult.filter(c => !c.bound && !userNames.has((c.nickName || '').trim()))
+    // Unbound classmates whose _id was NOT matched above
+    const unboundClassmates = classmatesResult.filter(c => !matchedClassmateIds.has(c._id))
 
     const all = [...mergedUsers, ...unboundClassmates]
 

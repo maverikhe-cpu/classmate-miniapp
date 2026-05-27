@@ -1,16 +1,14 @@
-<view class="photo-card card" bindtap="onTap">
-  <image class="card-thumb" src="{{photo.fileID}}" mode="aspectFill" />
+<view class="photo-card" bindtap="onTap">
+  <view class="card-header">
+    <image class="card-avatar" src="{{photo.uploaderAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
+    <text class="card-uploader-name">{{photo.uploaderName || '同学'}}</text>
+    <text class="card-date">{{displayDate}}</text>
+  </view>
+  <image class="card-photo" src="{{photo.fileID}}" mode="widthFix" />
   <view class="card-body">
     <text class="card-caption" wx:if="{{photo.caption}}">{{photo.caption}}</text>
     <view class="card-tags" wx:if="{{tagList.length > 0}}">
       <text class="photo-tag" wx:for="{{tagList}}" wx:key="name">{{item.icon}} {{item.name}}</text>
-    </view>
-    <view class="card-footer">
-      <view class="card-uploader">
-        <image class="avatar-small" src="{{photo.uploaderAvatar || '/images/default-avatar.png'}}" mode="aspectFill" />
-        <text class="uploader-name">{{photo.uploaderName || '同学'}}</text>
-      </view>
-      <text class="card-date">{{displayDate}}</text>
     </view>
     <view class="card-stats">
       <text class="stat">{{photo.isLiked ? '❤️' : '🤍'}} {{photo.likeCount || 0}}</text>

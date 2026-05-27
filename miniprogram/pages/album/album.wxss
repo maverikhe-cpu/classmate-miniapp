@@ -43,11 +43,9 @@
 }
 
 .photo-list {
-  padding: 16rpx 24rpx;
-}
-
-.photo-list photo-card {
-  margin-bottom: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }
 
 .empty-state {

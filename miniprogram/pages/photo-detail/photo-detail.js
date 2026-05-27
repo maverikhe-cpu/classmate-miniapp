@@ -1,24 +1,24 @@
 const { formatPhotoDate, PHOTO_TAG_ICONS } = require('../../utils/photoTags')
-const { formatRelativeTime } = require('../../utils/util')
-const app = getApp()
 
 Page({
   data: {
     photo: null,
     isUploader: false,
-    isLiked: false,
     displayDate: '',
-    tagList: [],
-    commentText: '',
-    showDateSheet: false,
-    dateSuggestion: '',
-    loading: false
+    tagList: []
   },
 
   onLoad(options) {
     if (options.id) {
       this.photoId = options.id
-      this.loadPhoto()
+      const eventChannel = this.getOpenerEventChannel()
+      if (eventChannel && eventChannel.on) {
+        eventChannel.on('photoData', (photo) => {
+          this.applyPhoto(photo)
+        })
+      } else {
+        this.loadPhoto()
+      }
     }
   },
 
@@ -26,38 +26,45 @@ Page({
     this.loadPhoto().then(() => wx.stopPullDownRefresh())
   },
 
+  applyPhoto(photo) {
+    const displayDate = formatPhotoDate(photo)
+    const tagList = (photo.tags || []).map(name => ({
+      name, icon: PHOTO_TAG_ICONS[name] || '📷'
+    }))
+
+    const openid = getApp().globalData.openid
+    this.setData({
+      photo,
+      isUploader: photo._openid === openid,
+      displayDate,
+      tagList
+    })
+  },
+
   async loadPhoto() {
     try {
-      const db = wx.cloud.database()
-      const { data: photo } = await db.collection('classPhotos').doc(this.photoId).get()
+      const res = await wx.cloud.callFunction({
+        name: 'getPhotoDetail',
+        data: { photoId: this.photoId }
+      })
 
-      if (!photo) {
-        wx.showToast({ title: '照片不存在', icon: 'none' })
+      if (!res.result || !res.result.success) {
+        wx.showModal({
+          title: '加载失败',
+          content: (res.result && res.result.error) || '未知错误',
+          showCancel: false
+        })
         return
       }
 
-      const openid = app.globalData.openid
-      const displayDate = formatPhotoDate(photo)
-      const tagList = (photo.tags || []).map(name => ({
-        name, icon: PHOTO_TAG_ICONS[name] || '📷'
-      }))
-
-      const comments = (photo.comments || []).map(c => ({
-        ...c,
-        formattedTime: c.createdAt ? formatRelativeTime(new Date(c.createdAt)) : ''
-      }))
-
-      this.setData({
-        photo,
-        isUploader: photo._openid === openid,
-        isLiked: (photo.likedBy || []).includes(openid),
-        displayDate,
-        tagList,
-        comments
-      })
+      this.applyPhoto(res.result.data)
     } catch (err) {
       console.error('loadPhoto error:', err)
-      wx.showToast({ title: '加载失败', icon: 'none' })
+      wx.showModal({
+        title: '调用失败',
+        content: err.errMsg || err.message || String(err),
+        showCancel: false
+      })
     }
   },
 
@@ -66,81 +73,6 @@ Page({
       urls: [this.data.photo.fileID],
       current: this.data.photo.fileID
     })
-  },
-
-  async toggleLike() {
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'likeClassPhoto',
-        data: { photoId: this.photoId }
-      })
-      if (res.result.success) {
-        const newLiked = res.result.liked
-        this.setData({
-          isLiked: newLiked,
-          'photo.likeCount': (this.data.photo.likeCount || 0) + (newLiked ? 1 : -1)
-        })
-      }
-    } catch (err) {
-      console.error('toggleLike error:', err)
-    }
-  },
-
-  onCommentInput(e) {
-    this.setData({ commentText: e.detail.value })
-  },
-
-  async submitComment() {
-    const { commentText } = this.data
-    if (!commentText.trim()) return
-
-    this.setData({ loading: true })
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'addClassPhotoComment',
-        data: { photoId: this.photoId, content: commentText }
-      })
-      if (res.result.success) {
-        this.setData({ commentText: '' })
-        this.loadPhoto()
-      }
-    } catch (err) {
-      console.error('submitComment error:', err)
-      wx.showToast({ title: '评论失败', icon: 'none' })
-    } finally {
-      this.setData({ loading: false })
-    }
-  },
-
-  showDateSuggestSheet() {
-    this.setData({ showDateSheet: true, dateSuggestion: '' })
-  },
-
-  hideDateSheet() {
-    this.setData({ showDateSheet: false })
-  },
-
-  onDateSuggestionInput(e) {
-    this.setData({ dateSuggestion: e.detail.value })
-  },
-
-  async submitDateSuggestion() {
-    const { dateSuggestion } = this.data
-    if (!dateSuggestion.trim()) return
-
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'suggestPhotoDate',
-        data: { photoId: this.photoId, suggestion: dateSuggestion }
-      })
-      if (res.result.success) {
-        this.setData({ showDateSheet: false })
-        this.loadPhoto()
-      }
-    } catch (err) {
-      console.error('submitDateSuggestion error:', err)
-      wx.showToast({ title: '提交失败', icon: 'none' })
-    }
   },
 
   async deletePhoto() {
@@ -159,6 +91,10 @@ Page({
         data: { photoId: this.photoId }
       })
       if (res.result.success) {
+        const pages = getCurrentPages()
+        const albumPage = pages.find(p => p.route === 'pages/album/album')
+        if (albumPage) albumPage._needsRefresh = true
+
         wx.showToast({ title: '已删除', icon: 'success' })
         setTimeout(() => wx.navigateBack(), 1500)
       }

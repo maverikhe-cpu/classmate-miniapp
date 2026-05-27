@@ -15,7 +15,7 @@ Page({
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
-      sizeType: ['compressed'],
+      sizeType: ['original', 'compressed'],
       success: (res) => {
         this.setData({ tempPath: res.tempFiles[0].tempFilePath })
       }
@@ -52,14 +52,27 @@ Page({
     }
 
     this.setData({ uploading: true })
-    wx.showLoading({ title: '上传中' })
+    wx.showLoading({ title: '上传中', mask: true })
 
     try {
-      const openid = app.globalData.openid
+      const openid = await app.getOpenId()
+      if (!openid) {
+        wx.hideLoading()
+        wx.showModal({ title: '调试', content: 'openid 为空，请退出重试', showCancel: false })
+        return
+      }
+
       const ext = tempPath.split('.').pop() || 'jpg'
       const cloudPath = `class-photos/${openid}_${Date.now()}.${ext}`
 
-      const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+      let uploadRes
+      try {
+        uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+      } catch (uploadErr) {
+        wx.hideLoading()
+        wx.showModal({ title: '文件上传失败', content: String(uploadErr.errMsg || uploadErr.message || uploadErr), showCancel: false })
+        return
+      }
 
       const submitData = {
         fileID: uploadRes.fileID,
@@ -71,23 +84,32 @@ Page({
         era: dateValue.era || null
       }
 
-      const res = await wx.cloud.callFunction({
-        name: 'uploadClassPhoto',
-        data: submitData
-      })
+      let res
+      try {
+        res = await wx.cloud.callFunction({
+          name: 'uploadClassPhoto',
+          data: submitData
+        })
+      } catch (fnErr) {
+        wx.hideLoading()
+        wx.showModal({ title: '云函数调用失败', content: String(fnErr.errMsg || fnErr.message || fnErr), showCancel: false })
+        return
+      }
 
-      if (res.result.success) {
+      wx.hideLoading()
+
+      if (res.result && res.result.success) {
         wx.showToast({ title: '上传成功', icon: 'success' })
         setTimeout(() => wx.navigateBack(), 1500)
       } else {
-        wx.showToast({ title: res.result.error || '上传失败', icon: 'none' })
+        const errMsg = (res.result && res.result.error) || '上传失败'
+        wx.showModal({ title: '上传失败', content: errMsg, showCancel: false })
       }
     } catch (err) {
-      console.error('upload error:', err)
-      wx.showToast({ title: '上传失败', icon: 'none' })
+      wx.hideLoading()
+      wx.showModal({ title: '异常', content: String(err.errMsg || err.message || err), showCancel: false })
     } finally {
       this.setData({ uploading: false })
-      wx.hideLoading()
     }
   }
 })
