@@ -9,7 +9,8 @@
     "pages/onboarding/onboarding",
     "pages/edit-activity/edit-activity",
     "pages/upload-photo/upload-photo",
-    "pages/photo-detail/photo-detail"
+    "pages/photo-detail/photo-detail",
+    "pages/edit-photo/edit-photo"
   ],
   "window": {
     "backgroundTextStyle": "light",

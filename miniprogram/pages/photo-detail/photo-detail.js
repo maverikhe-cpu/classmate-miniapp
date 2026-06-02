@@ -26,6 +26,12 @@ Page({
     this.loadPhoto().then(() => wx.stopPullDownRefresh())
   },
 
+  onShow() {
+    if (this.photoId && this.data.photo) {
+      this.loadPhoto()
+    }
+  },
+
   applyPhoto(photo) {
     const displayDate = formatPhotoDate(photo)
     const tagList = (photo.tags || []).map(name => ({
@@ -66,6 +72,20 @@ Page({
         showCancel: false
       })
     }
+  },
+
+  editPhoto() {
+    wx.navigateTo({
+      url: `/pages/edit-photo/edit-photo?id=${this.photoId}`,
+      events: {
+        photoUpdated: () => {
+          this.loadPhoto()
+        }
+      },
+      success: (res) => {
+        res.eventChannel.emit('photoData', this.data.photo)
+      }
+    })
   },
 
   previewImage() {

@@ -1,0 +1,42 @@
+<view class="page">
+  <view class="photo-area">
+    <image class="photo-preview" src="{{photo.fileID}}" mode="aspectFill" />
+  </view>
+
+  <view class="form-section">
+    <view class="form-group">
+      <text class="form-label">备注 <text class="required">*</text></text>
+      <textarea
+        class="form-textarea"
+        value="{{caption}}"
+        bindinput="onCaptionInput"
+        maxlength="200"
+        placeholder="描述一下这张照片..."
+        auto-height
+      />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">标签</text>
+      <view class="tag-row">
+        <view
+          class="tag-btn {{item.active ? 'tag-btn-active' : ''}}"
+          wx:for="{{tagItems}}"
+          wx:key="name"
+          bindtap="toggleTag"
+          data-index="{{index}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <fuzzy-date-picker value="{{dateValue}}" bind:change="onDateChange" />
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="btn-primary submit-btn" bindtap="save" loading="{{saving}}" disabled="{{saving}}">
+      保存
+    </button>
+  </view>
+</view>

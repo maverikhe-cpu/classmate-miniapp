@@ -18,6 +18,10 @@
       <text class="action-icon">↗</text>
       <text class="action-label">分享</text>
     </button>
+    <view class="action-btn" wx:if="{{isUploader}}" bindtap="editPhoto">
+      <text class="action-icon">✏️</text>
+      <text class="action-label">编辑</text>
+    </view>
     <view class="action-btn" wx:if="{{isUploader}}" bindtap="deletePhoto">
       <text class="action-icon">🗑️</text>
       <text class="action-label">删除</text>
