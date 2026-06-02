@@ -50,11 +50,13 @@
     </view>
 
     <button class="btn-primary btn-start" bindtap="goStart">开始</button>
+    <button class="btn-skip" bindtap="onSkip">暂不登录</button>
   </view>
 
   <!-- Step 2: Identity verification -->
   <view class="step-container" wx:if="{{step === 2}}">
     <view class="step-header">
+      <view class="back-btn" bindtap="goBack">‹ 返回</view>
       <text class="step-badge">步骤 1/3</text>
       <text class="step-title">身份验证</text>
       <text class="step-desc">请输入你在通讯录中的姓名</text>
@@ -85,6 +87,7 @@
     >
       验证身份
     </button>
+    <button class="btn-skip" bindtap="onSkip">放弃验证，退出</button>
   </view>
 
   <!-- Step 3: Profile editing -->
@@ -156,6 +159,7 @@
     </view>
 
     <button class="btn-primary btn-next" bindtap="goToStep4">下一步</button>
+    <button class="btn-skip" bindtap="onSkip">退出注册</button>
   </view>
 
   <!-- Step 4: Confirmation + Feature guide -->
@@ -227,6 +231,7 @@
     >
       开始使用同学圈
     </button>
+    <button class="btn-skip" bindtap="onSkip">退出注册</button>
   </view>
 
   <!-- 城市选择弹窗 -->

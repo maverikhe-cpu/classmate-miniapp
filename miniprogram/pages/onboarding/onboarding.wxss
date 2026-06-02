@@ -180,6 +180,20 @@
   border-radius: 16rpx;
 }
 
+.btn-skip {
+  width: 100%;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #9CA3AF;
+  background: transparent;
+  border: none;
+  margin-top: 16rpx;
+}
+
+.btn-skip::after {
+  border: none;
+}
+
 /* Step 2: Verify */
 .btn-verify {
   margin-top: 32rpx;

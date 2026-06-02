@@ -28,10 +28,19 @@ Page({
 
   onLoad() {
     this.setData({ countries: getAllCountries() })
+    app.getOpenId().then(() => {
+      if (app.globalData.onboarded) {
+        wx.switchTab({ url: '/pages/index/index' })
+      }
+    })
   },
 
   goStart() {
     this.setData({ step: 2 })
+  },
+
+  onSkip() {
+    wx.exitMiniProgram()
   },
 
   onNameInput(e) {
