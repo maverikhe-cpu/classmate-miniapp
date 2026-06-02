@@ -1,0 +1,55 @@
+<view bindtap="openPicker">
+  <slot></slot>
+</view>
+
+<page-container
+  show="{{visible}}"
+  overlay="{{true}}"
+  position="bottom"
+  round="{{true}}"
+  bindleave="closePicker"
+  custom-style="height: 70vh"
+>
+  <view class="panel">
+    <view class="panel-header">
+      <text class="panel-title">选择城市</text>
+      <view class="panel-close" bindtap="closePicker">✕</view>
+    </view>
+
+    <view class="search-bar">
+      <input
+        class="search-input"
+        placeholder="搜索或输入城市名"
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        confirm-type="done"
+        focus="{{visible}}"
+      />
+    </view>
+
+    <view class="city-list">
+      <view
+        class="city-item {{item === value ? 'city-item-active' : ''}}"
+        wx:for="{{filteredList}}"
+        wx:key="*this"
+        bindtap="onCityTap"
+        data-city="{{item}}"
+      >
+        <text>{{item}}</text>
+        <text class="city-check" wx:if="{{item === value}}">✓</text>
+      </view>
+
+      <view
+        class="city-item city-item-custom"
+        wx:if="{{keyword && filteredList.length === 0}}"
+        bindtap="onUseCustom"
+      >
+        <text>使用 "{{keyword}}"</text>
+      </view>
+
+      <view class="city-empty" wx:if="{{!keyword && filteredList.length === 0}}">
+        <text>请先选择国家</text>
+      </view>
+    </view>
+  </view>
+</page-container>

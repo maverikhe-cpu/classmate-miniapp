@@ -107,15 +107,7 @@
             <view class="picker-value">{{editCountry || '选择国家'}}</view>
           </picker>
           <view wx:if="{{editCities.length === 0}}" class="picker-value picker-disabled">选择城市</view>
-          <picker
-            wx:else
-            mode="selector"
-            range="{{editCities}}"
-            bindchange="onEditCityChange"
-            value="{{editCityIndex}}"
-          >
-            <view class="picker-value">{{editCity || '选择城市'}}</view>
-          </picker>
+          <view wx:else class="picker-value" bindtap="openCityPicker">{{editCity || '选择城市'}}</view>
         </view>
       </view>
 
@@ -171,6 +163,48 @@
     <view class="modal-actions">
       <button class="btn-secondary modal-btn" bindtap="closeEditModal">取消</button>
       <button class="btn-primary modal-btn" bindtap="saveProfile">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 城市选择弹窗 -->
+<view class="city-overlay" wx:if="{{showCityPicker}}" bindtap="closeCityPicker">
+  <view class="city-panel" catchtap="">
+    <view class="city-panel-header">
+      <text class="city-panel-title">选择城市</text>
+      <view class="city-panel-close" bindtap="closeCityPicker">✕</view>
+    </view>
+    <view class="city-search-bar">
+      <input
+        class="city-search-input"
+        placeholder="搜索或输入城市名"
+        value="{{cityKeyword}}"
+        bindinput="onCitySearchInput"
+        confirm-type="done"
+        focus="{{showCityPicker}}"
+      />
+    </view>
+    <view class="city-scroll-area">
+      <view
+        class="city-option {{item === editCity ? 'city-option-active' : ''}}"
+        wx:for="{{cityFilteredList}}"
+        wx:key="*this"
+        bindtap="onCitySelect"
+        data-city="{{item}}"
+      >
+        <text>{{item}}</text>
+        <text class="city-option-check" wx:if="{{item === editCity}}">✓</text>
+      </view>
+      <view
+        class="city-option city-option-custom"
+        wx:if="{{cityKeyword && cityFilteredList.length === 0}}"
+        bindtap="onCityCustom"
+      >
+        <text>使用 "{{cityKeyword}}"</text>
+      </view>
+      <view class="city-option-empty" wx:if="{{!cityKeyword && cityFilteredList.length === 0}}">
+        <text>请先选择国家</text>
+      </view>
     </view>
   </view>
 </view>

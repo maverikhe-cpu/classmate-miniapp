@@ -19,7 +19,10 @@ Page({
     editCountryIndex: -1,
     editCities: [],
     editCity: '',
-    editCityIndex: -1
+    editCityIndex: -1,
+    showCityPicker: false,
+    cityKeyword: '',
+    cityFilteredList: []
   },
 
   onLoad() {
@@ -79,32 +82,33 @@ Page({
       sizeType: ['compressed'],
       success: async (res) => {
         const tempPath = res.tempFiles[0].tempFilePath
-        const cloudPath = `avatars/${app.globalData.openid}_${Date.now()}.jpg`
 
         wx.showLoading({ title: '上传中' })
         try {
-          const uploadRes = await wx.cloud.uploadFile({
-            cloudPath,
-            filePath: tempPath
+          const fs = wx.getFileSystemManager()
+          const fileData = fs.readFileSync(tempPath, 'base64')
+
+          const uploadRes = await wx.cloud.callFunction({
+            name: 'updateAvatar',
+            data: { fileData }
           })
 
-          const db = wx.cloud.database()
-          const { data: user } = await db.collection('users')
-            .where({ _openid: app.globalData.openid })
-            .get()
-
-          if (user.length > 0) {
-            await db.collection('users').doc(user[0]._id).update({
-              data: { avatarUrl: uploadRes.fileID }
-            })
+          if (uploadRes.result && uploadRes.result.success) {
+            this.setData({ 'userInfo.avatarUrl': uploadRes.result.avatarUrl })
+            wx.hideLoading()
+            wx.showToast({ title: '头像已更新', icon: 'success' })
+          } else {
+            wx.hideLoading()
+            wx.showToast({ title: (uploadRes.result && uploadRes.result.error) || '上传失败', icon: 'none' })
           }
-
-          this.setData({ 'userInfo.avatarUrl': uploadRes.fileID })
-          wx.hideLoading()
         } catch (err) {
           console.error('upload avatar error:', err)
           wx.hideLoading()
-          wx.showToast({ title: '上传失败', icon: 'none' })
+          wx.showModal({
+            title: '上传失败',
+            content: err.errMsg || err.message || String(err),
+            showCancel: false
+          })
         }
       }
     })
@@ -190,12 +194,37 @@ Page({
     })
   },
 
+  openCityPicker() {
+    if (!this.data.editCountry) return
+    const allCities = getCitiesByCountry(this.data.editCountry)
+    this.setData({ showCityPicker: true, cityKeyword: '', cityFilteredList: allCities })
+  },
+
+  closeCityPicker() {
+    this.setData({ showCityPicker: false, cityKeyword: '' })
+  },
+
+  onCitySearchInput(e) {
+    const keyword = e.detail.value.trim()
+    const allCities = getCitiesByCountry(this.data.editCountry)
+    const filtered = keyword
+      ? allCities.filter(c => c.includes(keyword))
+      : allCities
+    this.setData({ cityKeyword: keyword, cityFilteredList: filtered })
+  },
+
+  onCitySelect(e) {
+    this.setData({ editCity: e.currentTarget.dataset.city })
+    this.closeCityPicker()
+  },
+
+  onCityCustom() {
+    this.setData({ editCity: this.data.cityKeyword })
+    this.closeCityPicker()
+  },
+
   onEditCityChange(e) {
-    const index = parseInt(e.detail.value)
-    this.setData({
-      editCity: this.data.editCities[index],
-      editCityIndex: index
-    })
+    this.setData({ editCity: e.detail.value })
   },
 
   async saveProfile() {
@@ -206,35 +235,26 @@ Page({
       return
     }
 
+    wx.showLoading({ title: '保存中', mask: true })
     try {
-      const db = wx.cloud.database()
-      const { data: user } = await db.collection('users')
-        .where({ _openid: app.globalData.openid })
-        .get()
-
-      if (user.length > 0) {
-        const updateData = {
+      const res = await wx.cloud.callFunction({
+        name: 'updateProfile',
+        data: {
           nickName: editName.trim(),
           bio: editBio.trim(),
+          country: editCountry || '',
+          city: editCity || '',
           wechat: editWechat.trim(),
           email: editEmail.trim(),
           phone: editPhone.trim(),
-          address: editAddress.trim(),
-          updatedAt: db.serverDate()
+          address: editAddress.trim()
         }
+      })
 
-        if (editCountry) {
-          updateData.country = editCountry
-          updateData.countryCode = getCountryCode(editCountry)
-        }
-        if (editCity) {
-          updateData.city = editCity
-        }
+      wx.hideLoading()
 
-        await db.collection('users').doc(user[0]._id).update({
-          data: updateData
-        })
-
+      if (res.result && res.result.success) {
+        const updateData = res.result.data
         this.setData({
           'userInfo.nickName': updateData.nickName,
           'userInfo.bio': updateData.bio,
@@ -242,17 +262,27 @@ Page({
           'userInfo.email': updateData.email,
           'userInfo.phone': updateData.phone,
           'userInfo.address': updateData.address,
-          'userInfo.country': updateData.country || this.data.userInfo.country,
-          'userInfo.countryCode': updateData.countryCode || this.data.userInfo.countryCode,
-          'userInfo.city': updateData.city || this.data.userInfo.city,
+          'userInfo.country': updateData.country,
+          'userInfo.countryCode': updateData.countryCode,
+          'userInfo.city': updateData.city,
           showEditModal: false
         })
-
         wx.showToast({ title: '保存成功', icon: 'success' })
+      } else {
+        wx.showModal({
+          title: '保存失败',
+          content: (res.result && res.result.error) || '未知错误',
+          showCancel: false
+        })
       }
     } catch (err) {
+      wx.hideLoading()
       console.error('saveProfile error:', err)
-      wx.showToast({ title: '保存失败', icon: 'none' })
+      wx.showModal({
+        title: '保存失败',
+        content: err.errMsg || err.message || String(err),
+        showCancel: false
+      })
     }
   },
 

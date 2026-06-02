@@ -250,3 +250,98 @@
   font-size: 28rpx;
   padding: 16rpx 0;
 }
+
+/* City picker overlay */
+.city-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.city-panel {
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.city-panel-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 32rpx 16rpx;
+}
+
+.city-panel-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.city-panel-close {
+  font-size: 32rpx;
+  color: #9CA3AF;
+  padding: 8rpx 16rpx;
+}
+
+.city-search-bar {
+  padding: 0 32rpx 20rpx;
+}
+
+.city-search-input {
+  background-color: #F3F4F6;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
+  color: #1F2937;
+}
+
+.city-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 32rpx;
+}
+
+.city-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #374151;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+
+.city-option-active {
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+.city-option-check {
+  color: #4F46E5;
+  font-size: 28rpx;
+}
+
+.city-option-custom {
+  color: #4F46E5;
+  font-weight: 500;
+}
+
+.city-option-empty {
+  text-align: center;
+  padding: 60rpx 0;
+  font-size: 28rpx;
+  color: #9CA3AF;
+}

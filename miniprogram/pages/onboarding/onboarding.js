@@ -20,7 +20,10 @@ Page({
     editPhone: '',
     editAddress: '',
     avatarUrl: '',
-    submitting: false
+    submitting: false,
+    showCityPicker: false,
+    cityKeyword: '',
+    cityFilteredList: []
   },
 
   onLoad() {
@@ -120,9 +123,37 @@ Page({
     this.setData({ editCountry: country, editCountryIndex: index, editCities: cities, editCity: '', editCityIndex: -1 })
   },
 
+  openCityPicker() {
+    if (!this.data.editCountry) return
+    const allCities = getCitiesByCountry(this.data.editCountry)
+    this.setData({ showCityPicker: true, cityKeyword: '', cityFilteredList: allCities })
+  },
+
+  closeCityPicker() {
+    this.setData({ showCityPicker: false, cityKeyword: '' })
+  },
+
+  onCitySearchInput(e) {
+    const keyword = e.detail.value.trim()
+    const allCities = getCitiesByCountry(this.data.editCountry)
+    const filtered = keyword
+      ? allCities.filter(c => c.includes(keyword))
+      : allCities
+    this.setData({ cityKeyword: keyword, cityFilteredList: filtered })
+  },
+
+  onCitySelect(e) {
+    this.setData({ editCity: e.currentTarget.dataset.city })
+    this.closeCityPicker()
+  },
+
+  onCityCustom() {
+    this.setData({ editCity: this.data.cityKeyword })
+    this.closeCityPicker()
+  },
+
   onEditCityChange(e) {
-    const index = parseInt(e.detail.value)
-    this.setData({ editCity: this.data.editCities[index], editCityIndex: index })
+    this.setData({ editCity: e.detail.value })
   },
 
   goBack() {
