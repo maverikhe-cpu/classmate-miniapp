@@ -26,8 +26,17 @@ const ERAS = ['大一', '大二', '大三', '大四', '毕业季', '毕业后']
 const formatPhotoDate = (photo) => {
   switch (photo.dateType) {
     case 'exact': {
-      const d = new Date(photo.exactDate)
-      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
+      if (photo.year && photo.month && photo.day) {
+        return `${photo.year}年${photo.month}月${photo.day}日`
+      }
+      if (photo.year && photo.month) {
+        return `${photo.year}年${photo.month}月`
+      }
+      if (photo.exactDate) {
+        const d = new Date(photo.exactDate)
+        return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
+      }
+      return `${photo.year || ''}年`
     }
     case 'year':
       return `${photo.year}年`

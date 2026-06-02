@@ -33,6 +33,9 @@
 }
 
 .field-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12rpx;
   margin-bottom: 12rpx;
 }
 
@@ -44,6 +47,7 @@
   border-radius: 12rpx;
   border: 1rpx solid #E5E7EB;
   text-align: center;
+  flex: 1;
 }
 
 .date-preview {

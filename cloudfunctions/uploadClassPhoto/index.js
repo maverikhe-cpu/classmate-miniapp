@@ -7,7 +7,7 @@ const db = cloud.database()
 exports.main = async (event) => {
   const wxContext = cloud.getWXContext()
   const openid = wxContext.OPENID
-  const { fileID, caption, tags, dateType, exactDate, year, season, era } = event
+  const { fileID, caption, tags, dateType, exactDate, year, month, day, season, era } = event
 
   if (!fileID) {
     return { success: false, error: '请选择照片' }
@@ -37,6 +37,8 @@ exports.main = async (event) => {
       dateType: dateType || 'unknown',
       exactDate: exactDate ? new Date(exactDate) : null,
       year: year || null,
+      month: month || null,
+      day: day || null,
       season: season || null,
       era: era || null,
       uploaderName: user.nickName || '同学',

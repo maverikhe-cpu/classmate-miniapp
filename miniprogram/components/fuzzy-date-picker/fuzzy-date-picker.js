@@ -14,14 +14,30 @@ Component({
     seasonValues: SEASONS.map(s => s.value),
     eras: ERAS,
     years: [],
+    months: Array.from({ length: 12 }, (_, i) => i + 1),
+    days: Array.from({ length: 31 }, (_, i) => i + 1),
     selectedDateType: 'unknown',
     selectedYear: 0,
+    selectedMonth: 0,
+    selectedDay: 0,
     selectedSeason: 0,
     selectedEra: 0,
     displayText: '记不清了'
   },
 
   observers: {
+    'selectedYear, selectedMonth': function (yearIdx, monthIdx) {
+      const year = this.data.years[yearIdx]
+      const month = this.data.months[monthIdx]
+      if (!year || !month) return
+      const daysInMonth = new Date(year, month, 0).getDate()
+      const dayOptions = Array.from({ length: daysInMonth }, (_, i) => i + 1)
+      if (this.data.selectedDay >= dayOptions.length) {
+        this.setData({ dayOptions, selectedDay: dayOptions.length - 1 })
+      } else {
+        this.setData({ dayOptions })
+      }
+    },
     'value': function (val) {
       if (!val) return
       const currentYear = new Date().getFullYear()
@@ -61,6 +77,18 @@ Component({
       this.updateDisplay()
     },
 
+    onMonthChange(e) {
+      this.setData({ selectedMonth: parseInt(e.detail.value) })
+      this.emitChange()
+      this.updateDisplay()
+    },
+
+    onDayChange(e) {
+      this.setData({ selectedDay: parseInt(e.detail.value) })
+      this.emitChange()
+      this.updateDisplay()
+    },
+
     onSeasonChange(e) {
       this.setData({ selectedSeason: parseInt(e.detail.value) })
       this.emitChange()
@@ -80,6 +108,10 @@ Component({
       if (type === 'exact' || type === 'year' || type === 'season') {
         result.year = this.data.years[this.data.selectedYear] || null
       }
+      if (type === 'exact') {
+        result.month = this.data.months[this.data.selectedMonth] || null
+        result.day = this.data.dayOptions[this.data.selectedDay] || null
+      }
       if (type === 'season') {
         result.season = this.data.seasonValues[this.data.selectedSeason] || null
       }
@@ -94,7 +126,19 @@ Component({
       const type = this.data.selectedDateType
       let text = ''
       switch (type) {
-        case 'exact':
+        case 'exact': {
+          const y = this.data.years[this.data.selectedYear] || ''
+          const m = this.data.months[this.data.selectedMonth] || ''
+          const d = this.data.dayOptions ? this.data.dayOptions[this.data.selectedDay] : ''
+          if (m && d) {
+            text = `${y}年${m}月${d}日`
+          } else if (m) {
+            text = `${y}年${m}月`
+          } else {
+            text = `${y}年`
+          }
+          break
+        }
         case 'year':
           text = `${this.data.years[this.data.selectedYear] || ''}年`
           break

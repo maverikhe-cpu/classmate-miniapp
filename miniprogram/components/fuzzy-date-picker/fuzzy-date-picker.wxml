@@ -14,6 +14,12 @@
     <picker mode="selector" range="{{years}}" bindchange="onYearChange" value="{{selectedYear}}">
       <view class="field-value">{{years[selectedYear] || '选择年份'}}年</view>
     </picker>
+    <picker wx:if="{{selectedDateType === 'exact'}}" mode="selector" range="{{months}}" bindchange="onMonthChange" value="{{selectedMonth}}">
+      <view class="field-value">{{months[selectedMonth] || '选择月份'}}月</view>
+    </picker>
+    <picker wx:if="{{selectedDateType === 'exact'}}" mode="selector" range="{{dayOptions}}" bindchange="onDayChange" value="{{selectedDay}}">
+      <view class="field-value">{{dayOptions[selectedDay] || '选择日期'}}日</view>
+    </picker>
   </view>
 
   <view class="field-row" wx:if="{{selectedDateType === 'season'}}">

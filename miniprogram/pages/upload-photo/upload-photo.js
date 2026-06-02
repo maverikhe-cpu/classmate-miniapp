@@ -80,6 +80,8 @@ Page({
         tags: selectedTags,
         dateType: dateValue.dateType,
         year: dateValue.year || null,
+        month: dateValue.month || null,
+        day: dateValue.day || null,
         season: dateValue.season || null,
         era: dateValue.era || null
       }
