@@ -76,6 +76,22 @@
     </view>
   </scroll-view>
 
+  <!-- 排序 -->
+  <view class="sort-row">
+    <picker mode="selector" range="{{sortFields}}" bindchange="onSortFieldChange" value="{{sortFieldIndex}}">
+      <view class="filter-pill filter-active">
+        <text>{{sortFields[sortFieldIndex]}}</text>
+        <text class="filter-arrow">▼</text>
+      </view>
+    </picker>
+    <picker mode="selector" range="{{sortOrders}}" bindchange="onSortOrderChange" value="{{sortOrderIndex}}">
+      <view class="filter-pill filter-active">
+        <text>{{sortOrders[sortOrderIndex]}}</text>
+        <text class="filter-arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
   <!-- 活动列表 -->
   <view class="activity-list" wx:if="{{activities.length > 0}}">
     <activity-card

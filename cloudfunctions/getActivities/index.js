@@ -6,7 +6,7 @@ const db = cloud.database()
 const _ = db.command
 
 exports.main = async (event) => {
-  const { status = 'all', country = '', city = '', category = '', page = 0, pageSize = 20 } = event
+  const { status = 'all', country = '', city = '', category = '', sortField = 'createdAt', sortOrder = 'desc', page = 0, pageSize = 20 } = event
 
   try {
     let query = { status: _.neq('cancelled') }
@@ -46,7 +46,7 @@ exports.main = async (event) => {
 
     const { data: activities } = await db.collection('activities')
       .where(query)
-      .orderBy('createdAt', 'desc')
+      .orderBy(sortField, sortOrder)
       .skip(page * pageSize)
       .limit(pageSize)
       .get()

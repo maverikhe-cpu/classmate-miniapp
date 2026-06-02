@@ -5,6 +5,8 @@ page {
   color: #333333;
   font-size: 28rpx;
   line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* 通用容器 */

@@ -16,7 +16,11 @@ Page({
     filterCity: '',
     filterCityIndex: -1,
     categoryList: ['全部', ...CATEGORIES],
-    filterCategory: ''
+    filterCategory: '',
+    sortFields: ['开始时间', '创建时间'],
+    sortFieldIndex: 0,
+    sortOrders: ['降序', '升序'],
+    sortOrderIndex: 0
   },
 
   onLoad() {
@@ -106,6 +110,26 @@ Page({
     this.loadActivities()
   },
 
+  onSortFieldChange(e) {
+    this.setData({
+      sortFieldIndex: parseInt(e.detail.value),
+      activities: [],
+      page: 0,
+      hasMore: true
+    })
+    this.loadActivities()
+  },
+
+  onSortOrderChange(e) {
+    this.setData({
+      sortOrderIndex: parseInt(e.detail.value),
+      activities: [],
+      page: 0,
+      hasMore: true
+    })
+    this.loadActivities()
+  },
+
   async loadActivities() {
     if (this.data.loading) return
 
@@ -119,6 +143,8 @@ Page({
           country: this.data.filterCountry,
           city: this.data.filterCity,
           category: this.data.filterCategory,
+          sortField: this.data.sortFieldIndex === 0 ? 'startTime' : 'createdAt',
+          sortOrder: this.data.sortOrderIndex === 0 ? 'desc' : 'asc',
           page: this.data.page,
           pageSize: 20
         }

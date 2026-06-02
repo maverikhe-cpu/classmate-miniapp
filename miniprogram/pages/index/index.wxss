@@ -113,6 +113,17 @@
   background-color: #EEF2FF;
 }
 
+.sort-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: #ffffff;
+  padding: 12rpx 24rpx;
+  gap: 16rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
 .load-more {
   text-align: center;
   padding: 30rpx 0;
