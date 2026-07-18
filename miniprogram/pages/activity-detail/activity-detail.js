@@ -34,8 +34,8 @@ Page({
     this.loadDetail().then(() => wx.stopPullDownRefresh())
   },
 
-  async loadDetail() {
-    wx.showLoading({ title: '加载中' })
+  async loadDetail(quiet) {
+    if (!quiet) wx.showLoading({ title: '加载中' })
 
     try {
       const res = await wx.cloud.callFunction({
@@ -80,7 +80,7 @@ Page({
       console.error('loadDetail error:', err)
       wx.showToast({ title: '加载失败', icon: 'none' })
     } finally {
-      wx.hideLoading()
+      if (!quiet) wx.hideLoading()
     }
   },
 
@@ -172,8 +172,9 @@ Page({
   async choosePhotos() {
     if (this.data.uploading) return
 
+    let chooseRes
     try {
-      const chooseRes = await new Promise((resolve, reject) => {
+      chooseRes = await new Promise((resolve, reject) => {
         wx.chooseMedia({
           count: 9,
           mediaType: ['image'],
@@ -182,43 +183,90 @@ Page({
           fail: reject
         })
       })
+    } catch (err) {
+      // 用户取消选择，静默返回
+      return
+    }
 
-      if (!chooseRes.tempFiles || chooseRes.tempFiles.length === 0) return
+    const tempFiles = chooseRes.tempFiles || []
+    if (tempFiles.length === 0) return
 
-      this.setData({ uploading: true })
-      wx.showLoading({ title: '上传中' })
+    this.setData({ uploading: true })
+    wx.showLoading({ title: `上传中 0/${tempFiles.length}` })
 
-      const openid = app.globalData.openid
-      const timestamp = Date.now()
-      const fileIDs = []
+    const openid = app.globalData.openid
+    const timestamp = Date.now()
 
-      for (let i = 0; i < chooseRes.tempFiles.length; i++) {
-        const tempPath = chooseRes.tempFiles[i].tempFilePath
-        const ext = tempPath.split('.').pop() || 'jpg'
-        const cloudPath = `activity-photos/${this.activityId}/${openid}_${timestamp}_${i}.${ext}`
+    const uploadOne = async (file, index) => {
+      const tempPath = file.tempFilePath
+      const match = /\.([a-zA-Z0-9]+)$/.exec(tempPath)
+      const ext = match ? match[1] : 'jpg'
+      const cloudPath = `activity-photos/${this.activityId}/${openid}_${timestamp}_${index}.${ext}`
+      const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
+      return uploadRes.fileID
+    }
 
-        const uploadRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath })
-        fileIDs.push(uploadRes.fileID)
+    // 并发上传，单张失败不影响其他照片；失败的自动重试一次
+    let doneCount = 0
+    const results = await Promise.all(tempFiles.map(async (file, i) => {
+      try {
+        const fileID = await uploadOne(file, i)
+        return { fileID }
+      } catch (err) {
+        console.error('upload photo error, retrying:', i, err)
+        try {
+          const fileID = await uploadOne(file, i)
+          return { fileID }
+        } catch (retryErr) {
+          console.error('upload photo retry failed:', i, retryErr)
+          return { error: retryErr }
+        }
+      } finally {
+        doneCount++
+        wx.showLoading({ title: `上传中 ${doneCount}/${tempFiles.length}` })
+      }
+    }))
+
+    const fileIDs = results.filter(r => r.fileID).map(r => r.fileID)
+    const failCount = results.length - fileIDs.length
+
+    try {
+      if (fileIDs.length > 0) {
+        const addRes = await wx.cloud.callFunction({
+          name: 'addActivityPhotos',
+          data: { activityId: this.activityId, fileIDs }
+        })
+
+        if (!addRes.result.success) {
+          wx.hideLoading()
+          wx.showToast({ title: addRes.result.error || '上传失败', icon: 'none' })
+          return
+        }
       }
 
-      const addRes = await wx.cloud.callFunction({
-        name: 'addActivityPhotos',
-        data: { activityId: this.activityId, fileIDs }
-      })
-
-      if (addRes.result.success) {
+      wx.hideLoading()
+      if (failCount === 0) {
         wx.showToast({ title: '上传成功', icon: 'success' })
-        this.loadDetail()
+      } else if (fileIDs.length > 0) {
+        wx.showModal({
+          title: '部分照片上传失败',
+          content: `成功 ${fileIDs.length} 张，失败 ${failCount} 张，可重新选择失败的照片再次上传`,
+          showCancel: false,
+          confirmText: '知道了'
+        })
       } else {
-        wx.showToast({ title: addRes.result.error || '上传失败', icon: 'none' })
+        wx.showToast({ title: '上传失败，请重试', icon: 'none' })
+      }
+
+      if (fileIDs.length > 0) {
+        this.loadDetail(true)
       }
     } catch (err) {
-      if (err.errMsg && err.errMsg.includes('cancel')) return
       console.error('choosePhotos error:', err)
+      wx.hideLoading()
       wx.showToast({ title: '上传失败', icon: 'none' })
     } finally {
       this.setData({ uploading: false })
-      wx.hideLoading()
     }
   },
 
