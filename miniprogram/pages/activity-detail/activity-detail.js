@@ -369,10 +369,22 @@ Page({
 
   onShareAppMessage() {
     const activity = this.data.activity
+    if (!activity) {
+      return {
+        title: '同学圈',
+        path: '/pages/index/index',
+        imageUrl: '/images/share-default.png'
+      }
+    }
+    const photos = activity.photos || []
+    // 分享卡片图优先级：封面图 → 相册首张照片 → 默认图
+    const imageUrl = activity.coverImage
+      || (photos.length > 0 ? photos[0].fileID : '')
+      || '/images/share-default.png'
     return {
       title: `${activity.title} — 同学圈`,
       path: `/pages/activity-detail/activity-detail?id=${this.activityId}`,
-      imageUrl: activity.coverImage || ''
+      imageUrl
     }
   }
 })

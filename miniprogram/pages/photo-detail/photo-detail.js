@@ -127,7 +127,8 @@ Page({
   onShareAppMessage() {
     return {
       title: this.data.photo?.caption || '同学回忆',
-      path: `/pages/photo-detail/photo-detail?id=${this.photoId}`
+      path: `/pages/photo-detail/photo-detail?id=${this.photoId}`,
+      imageUrl: this.data.photo?.fileID || '/images/share-default.png'
     }
   }
 })
