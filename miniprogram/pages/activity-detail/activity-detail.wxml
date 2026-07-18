@@ -70,9 +70,7 @@
         <text class="info-icon">👥</text>
         <view class="info-content">
           <text class="info-label">人数</text>
-          <text class="info-value">
-            {{activity.members.length}}{{activity.maxMembers ? '/' + activity.maxMembers : ''}}人参加
-          </text>
+          <text class="info-value">{{activity.members.length}}{{activity.maxMembers ? '/' + activity.maxMembers : ''}}人参加</text>
         </view>
       </view>
       <view class="divider" wx:if="{{activity.signupDeadline}}"></view>
@@ -94,21 +92,35 @@
     <!-- Members -->
     <view class="card">
       <text class="section-title">参与成员 ({{activity.members.length}})</text>
-      <view class="member-list" wx:if="{{memberDetails.length > 0}}">
-        <view class="member-item" wx:for="{{memberDetails}}" wx:key="_openid">
-          <image
-            class="avatar member-avatar"
-            src="{{item.avatarUrl || '/images/default-avatar.png'}}"
-            mode="aspectFill"
-          />
-          <text class="member-name">{{item.nickName || '同学'}}</text>
-          <view class="organizer-badge" wx:if="{{item._openid === activity._openid}}">
-            <text class="badge-text">发起人</text>
+      <view class="member-grid" wx:if="{{memberDetails.length > 0}}">
+        <view
+          class="member-cell"
+          wx:for="{{membersExpanded ? memberDetails : memberPreview}}"
+          wx:key="_openid"
+        >
+          <view class="member-avatar-wrap">
+            <image
+              class="member-avatar"
+              src="{{item.avatarUrl || '/images/default-avatar.png'}}"
+              mode="aspectFill"
+              lazy-load
+            />
+            <view class="organizer-corner" wx:if="{{item._openid === activity._openid}}">
+              <text class="organizer-corner-text">发起人</text>
+            </view>
           </view>
+          <text class="member-name">{{item.nickName || '同学'}}</text>
         </view>
       </view>
       <view wx:else class="member-empty">
         <text class="empty-text">暂无成员</text>
+      </view>
+      <view
+        class="member-toggle"
+        wx:if="{{memberDetails.length > memberPreviewSize}}"
+        bindtap="toggleMembers"
+      >
+        <text>{{membersExpanded ? '收起 ▲' : '展开全部 ' + memberDetails.length + ' 人 ▼'}}</text>
       </view>
     </view>
 
@@ -141,30 +153,30 @@
 
     <!-- Bottom bar -->
     <view class="bottom-bar safe-bottom">
-      <view class="quick-actions">
-        <button class="btn-quick" wx:if="{{isCreator || hasJoined}}" bindtap="addToCalendar">
+      <view class="bottom-row">
+        <button class="btn-quick" size="mini" wx:if="{{isCreator || hasJoined}}" bindtap="addToCalendar">
           <text class="quick-icon">📅</text>
           <text class="quick-label">日历</text>
         </button>
-        <button class="btn-quick" open-type="share">
+        <button class="btn-quick" size="mini" open-type="share">
           <text class="quick-icon">↗</text>
           <text class="quick-label">分享</text>
         </button>
-      </view>
-      <view class="action-buttons">
-        <block wx:if="{{isCreator}}">
-          <button class="btn-secondary flex-1" bindtap="goEdit">编辑</button>
-          <button class="btn-danger flex-1" bindtap="cancelActivity" disabled="{{actionLoading}}">取消活动</button>
-        </block>
-        <block wx:elif="{{hasJoined}}">
-          <button class="btn-secondary flex-1" bindtap="cancelSignup" disabled="{{actionLoading}}" loading="{{actionLoading}}">取消报名</button>
-        </block>
-        <block wx:elif="{{canSignup}}">
-          <button class="btn-primary flex-1" bindtap="signup" disabled="{{actionLoading}}" loading="{{actionLoading}}">立即报名</button>
-        </block>
-        <block wx:else>
-          <button class="btn-disabled flex-1" disabled>{{statusText}}</button>
-        </block>
+        <view class="action-buttons flex-1">
+          <block wx:if="{{isCreator}}">
+            <button class="btn-secondary flex-1" bindtap="goEdit">编辑</button>
+            <button class="btn-danger flex-1" bindtap="cancelActivity" disabled="{{actionLoading}}">取消活动</button>
+          </block>
+          <block wx:elif="{{hasJoined}}">
+            <button class="btn-secondary flex-1" bindtap="cancelSignup" disabled="{{actionLoading}}" loading="{{actionLoading}}">取消报名</button>
+          </block>
+          <block wx:elif="{{canSignup}}">
+            <button class="btn-primary flex-1" bindtap="signup" disabled="{{actionLoading}}" loading="{{actionLoading}}">立即报名</button>
+          </block>
+          <block wx:else>
+            <button class="btn-disabled flex-1" disabled>{{statusText}}</button>
+          </block>
+        </view>
       </view>
     </view>
   </view>

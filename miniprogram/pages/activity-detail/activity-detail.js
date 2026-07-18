@@ -5,6 +5,9 @@ Page({
   data: {
     activity: null,
     memberDetails: [],
+    memberPreview: [],
+    memberPreviewSize: 10,
+    membersExpanded: false,
     isCreator: false,
     hasJoined: false,
     canSignup: false,
@@ -50,6 +53,7 @@ Page({
       const activity = result.data
       const status = getActivityStatus(activity)
       const openid = app.globalData.openid
+      const memberDetails = activity.memberDetails || []
 
       const offset = activity.timezoneOffset != null ? activity.timezoneOffset : 8
       const startTime = new Date(activity.startTime)
@@ -59,7 +63,8 @@ Page({
 
       this.setData({
         activity,
-        memberDetails: activity.memberDetails || [],
+        memberDetails,
+        memberPreview: memberDetails.slice(0, this.data.memberPreviewSize),
         isCreator: activity._openid === openid,
         hasJoined: activity.members.includes(openid),
         canSignup: status === 'open' || status === 'ongoing',
@@ -77,6 +82,10 @@ Page({
     } finally {
       wx.hideLoading()
     }
+  },
+
+  toggleMembers() {
+    this.setData({ membersExpanded: !this.data.membersExpanded })
   },
 
   async signup() {
