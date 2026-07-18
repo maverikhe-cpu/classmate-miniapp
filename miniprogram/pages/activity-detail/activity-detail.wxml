@@ -22,6 +22,13 @@
   <view wx:if="{{activity}}">
     <!-- Cover -->
     <view class="cover-section">
+      <image
+        wx:if="{{activity.coverImage}}"
+        class="cover-bg"
+        src="{{activity.coverImage}}"
+        mode="aspectFill"
+      />
+      <view wx:if="{{activity.coverImage}}" class="cover-mask"></view>
       <view class="status-bar">
         <view class="tag {{statusTagClass}}">{{statusText}}</view>
       </view>
@@ -133,18 +140,21 @@
         </view>
       </view>
       <view class="photo-grid" wx:if="{{photos.length > 0}}">
-        <image
-          wx:for="{{photos}}"
-          wx:key="fileID"
-          class="photo-thumb"
-          src="{{item.fileID}}"
-          mode="aspectFill"
-          bindtap="previewPhoto"
-          data-url="{{item.fileID}}"
-          bindlongpress="deletePhoto"
-          data-fileid="{{item.fileID}}"
-          data-uploader="{{item.uploader}}"
-        />
+        <view class="photo-cell" wx:for="{{photos}}" wx:key="fileID">
+          <image
+            class="photo-thumb"
+            src="{{item.fileID}}"
+            mode="aspectFill"
+            bindtap="previewPhoto"
+            data-url="{{item.fileID}}"
+            bindlongpress="onPhotoLongPress"
+            data-fileid="{{item.fileID}}"
+            data-uploader="{{item.uploader}}"
+          />
+          <view class="photo-cover-badge" wx:if="{{item.fileID === activity.coverImage}}">
+            <text class="photo-cover-badge-text">封面</text>
+          </view>
+        </view>
         <view
           class="photo-upload-tile"
           wx:if="{{isCreator || hasJoined}}"

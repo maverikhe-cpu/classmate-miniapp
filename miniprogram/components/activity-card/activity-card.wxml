@@ -1,26 +1,34 @@
 <view class="activity-card card {{statusTagClass === 'tag-ended' || statusTagClass === 'tag-cancelled' ? 'card-past' : ''}}" bindtap="onTap">
   <view class="card-header">
-    <view class="card-title-row">
-      <text class="card-title">{{activity.title}}</text>
-      <view class="tag {{statusTagClass}}">{{statusText}}</view>
-    </view>
-    <view class="card-categories" wx:if="{{categoryTags.length > 0}}">
-      <view class="card-category" wx:for="{{categoryTags}}" wx:key="name">
-        <text class="category-icon">{{item.icon}}</text>
-        <text class="category-name">{{item.name}}</text>
+    <view class="card-header-main">
+      <view class="card-title-row">
+        <text class="card-title">{{activity.title}}</text>
+        <view class="tag {{statusTagClass}}">{{statusText}}</view>
+      </view>
+      <view class="card-categories" wx:if="{{categoryTags.length > 0}}">
+        <view class="card-category" wx:for="{{categoryTags}}" wx:key="name">
+          <text class="category-icon">{{item.icon}}</text>
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </view>
+      <view class="card-meta">
+        <text class="meta-item">{{formattedDateTime}}</text>
+      </view>
+      <view class="card-meta" wx:if="{{activity.city}}">
+        <text class="meta-icon">🌍</text>
+        <text class="meta-item">{{activity.country}} · {{activity.city}}</text>
+      </view>
+      <view class="card-meta" wx:if="{{activity.location}}">
+        <text class="meta-icon">📍</text>
+        <text class="meta-item">{{activity.location}}</text>
       </view>
     </view>
-    <view class="card-meta">
-      <text class="meta-item">{{formattedDateTime}}</text>
-    </view>
-    <view class="card-meta" wx:if="{{activity.city}}">
-      <text class="meta-icon">🌍</text>
-      <text class="meta-item">{{activity.country}} · {{activity.city}}</text>
-    </view>
-    <view class="card-meta" wx:if="{{activity.location}}">
-      <text class="meta-icon">📍</text>
-      <text class="meta-item">{{activity.location}}</text>
-    </view>
+    <image
+      wx:if="{{activity.coverImage}}"
+      class="card-cover"
+      src="{{activity.coverImage}}"
+      mode="aspectFill"
+    />
   </view>
 
   <view class="card-footer">

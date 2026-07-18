@@ -3,6 +3,7 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event) => {
   const wxContext = cloud.getWXContext()
@@ -32,12 +33,17 @@ exports.main = async (event) => {
 
     const remainingPhotos = (activity.photos || []).filter(p => p.fileID !== fileID)
 
-    await db.collection('activities').doc(activityId).update({
-      data: {
-        photos: remainingPhotos,
-        updatedAt: db.serverDate()
-      }
-    })
+    const updateData = {
+      photos: remainingPhotos,
+      updatedAt: db.serverDate()
+    }
+
+    // 删除的是封面时一并清除封面引用
+    if (activity.coverImage === fileID) {
+      updateData.coverImage = _.remove()
+    }
+
+    await db.collection('activities').doc(activityId).update({ data: updateData })
 
     try {
       await cloud.deleteFile({ fileList: [fileID] })

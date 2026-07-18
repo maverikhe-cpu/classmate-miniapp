@@ -276,15 +276,54 @@ Page({
     wx.previewImage({ urls, current })
   },
 
-  async deletePhoto(e) {
+  onPhotoLongPress(e) {
     const { fileid, uploader } = e.currentTarget.dataset
     const openid = app.globalData.openid
+    const canSetCover = this.data.isCreator
+    const canDelete = this.data.isCreator || uploader === openid
 
-    if (openid !== this.data.activity._openid && uploader !== openid) {
-      wx.showToast({ title: '无权删除此照片', icon: 'none' })
+    const itemList = []
+    if (canSetCover) itemList.push('设为封面')
+    if (canDelete) itemList.push('删除照片')
+
+    if (itemList.length === 0) {
+      wx.showToast({ title: '无权操作此照片', icon: 'none' })
       return
     }
 
+    wx.showActionSheet({
+      itemList,
+      success: (res) => {
+        const action = itemList[res.tapIndex]
+        if (action === '设为封面') {
+          this.setCover(fileid)
+        } else if (action === '删除照片') {
+          this.confirmDeletePhoto(fileid)
+        }
+      }
+    })
+  },
+
+  async setCover(fileID) {
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'setActivityCover',
+        data: { activityId: this.activityId, fileID }
+      })
+
+      if (res.result.success) {
+        wx.showToast({ title: '已设为封面', icon: 'success' })
+        this.loadDetail(true)
+      } else {
+        wx.showToast({ title: res.result.error || '设置失败', icon: 'none' })
+      }
+    } catch (err) {
+      console.error('setCover error:', err)
+      wx.showToast({ title: '设置失败', icon: 'none' })
+    }
+  },
+
+  async confirmDeletePhoto(fileid) {
     const confirmed = await new Promise(resolve => {
       wx.showModal({
         title: '确认删除',
