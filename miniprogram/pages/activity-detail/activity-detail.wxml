@@ -145,6 +145,14 @@
           data-fileid="{{item.fileID}}"
           data-uploader="{{item.uploader}}"
         />
+        <view
+          class="photo-upload-tile"
+          wx:if="{{isCreator || hasJoined}}"
+          bindtap="choosePhotos"
+        >
+          <text class="tile-icon">📷</text>
+          <text class="tile-text">{{uploading ? '上传中' : '上传'}}</text>
+        </view>
       </view>
       <view wx:elif="{{isCreator || hasJoined}}" class="photo-empty">
         <text class="empty-text">还没有照片，快来上传吧</text>
@@ -161,6 +169,10 @@
         <button class="btn-quick" size="mini" open-type="share">
           <text class="quick-icon">↗</text>
           <text class="quick-label">分享</text>
+        </button>
+        <button class="btn-quick" size="mini" wx:if="{{isCreator || hasJoined}}" bindtap="choosePhotos">
+          <text class="quick-icon">📷</text>
+          <text class="quick-label">传照片</text>
         </button>
         <view class="action-buttons flex-1">
           <block wx:if="{{isCreator}}">
