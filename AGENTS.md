@@ -39,7 +39,7 @@ miniprogram/            # 小程序前端（project.config.json 的 miniprogramR
                         #   cityCoords.js(地图坐标), categories.js(活动分类),
                         #   photoTags.js(照片标签/模糊日期), markdown.js(轻量 md→rich-text)
   images/               # tab 图标、默认头像、share-default.png(分享默认图)等静态资源
-cloudfunctions/         # 26 个云函数（project.config.json 的 cloudfunctionRoot）
+cloudfunctions/         # 27 个云函数（project.config.json 的 cloudfunctionRoot）
   <functionName>/       # 每个含 index.js + package.json
 tests/                  # E2E 自动化测试（miniprogram-automator）
   run.js                # 测试入口/运行器
@@ -52,7 +52,7 @@ project.private.config.json  # 本机私有配置
 云函数按职责分组：
 
 - 用户与名册：`login`、`bindClassmate`、`getUnboundClassmates`、`updateProfile`、`updateAvatar`
-- 活动：`getActivities`、`getActivityDetail`、`createActivity`、`updateActivity`、`signupActivity`、`cancelSignup`、`addActivityPhotos`、`deleteActivityPhoto`、`setActivityCover`
+- 活动：`getActivities`、`getActivityDetail`、`createActivity`、`updateActivity`、`cancelActivity`、`signupActivity`、`cancelSignup`、`addActivityPhotos`、`deleteActivityPhoto`、`setActivityCover`
 - 照片：`classPhotos`、`getPhotoDetail`、`uploadClassPhoto`、`updatePhoto`、`deleteClassPhoto`
 - 仅后端、前端尚未接入：`likeClassPhoto`、`addClassPhotoComment`、`suggestPhotoDate`（`classPhotos` 记录已预留 `comments`/`likeCount`/`likedBy`/`dateSuggestions` 字段）
 - 运维/管理（开发者工具中手动调用，客户端无入口）：`seedData`（导入 `classmates.json` 名册，支持 seed/status/reset/reseed）、`resetUsers`、`cleanupUsers`（数据修复，支持 dryRun/clean）

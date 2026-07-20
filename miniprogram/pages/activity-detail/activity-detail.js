@@ -176,12 +176,17 @@ Page({
 
     this.setData({ actionLoading: true })
     try {
-      await wx.cloud.database().collection('activities').doc(this.activityId).update({
-        data: { status: 'cancelled' }
+      const res = await wx.cloud.callFunction({
+        name: 'cancelActivity',
+        data: { activityId: this.activityId }
       })
 
-      wx.showToast({ title: '活动已取消', icon: 'success' })
-      setTimeout(() => wx.navigateBack(), 1500)
+      if (res.result.success) {
+        wx.showToast({ title: '活动已取消', icon: 'success' })
+        setTimeout(() => wx.navigateBack(), 1500)
+      } else {
+        wx.showToast({ title: res.result.error || '取消失败', icon: 'none' })
+      }
     } catch (err) {
       console.error('cancelActivity error:', err)
       wx.showToast({ title: '取消失败', icon: 'none' })
