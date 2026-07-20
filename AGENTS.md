@@ -73,6 +73,14 @@ project.private.config.json  # 本机私有配置
      同一函数刚部署完会处于 Creating/Updating 状态，立即重试会报 `FailedOperation.UpdateFunctionCode`，等 30~60 秒再试。
 3. 首次初始化环境时，在开发者工具的云函数调试中手动调用 `seedData`（`{ action: 'seed' }`）导入名册。
 
+**云函数超时时间**：所有云函数执行超时已统一调整为 **20 秒**（创建时默认仅 3 秒，冷启动约 5 秒会被平台杀掉，曾导致 `callFunction` 偶发失败，长操作后尤其高发）。调整命令（tcb CLI 需登录拥有 `cloud1-d7gakdyxk317f169d` 的账号）：
+
+```sh
+tcb config update fn <fnName> --timeout 20 -e cloud1-d7gakdyxk317f169d
+```
+
+新建云函数后记得同样把超时改为 20 秒。客户端对关键调用（`addActivityPhotos`、`getActivityDetail`）另加了一次自动重试兜底。
+
 发布通过开发者工具的"上传/预览"流程进行，无 CI/CD。
 
 ## 测试
