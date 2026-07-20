@@ -1,6 +1,25 @@
 const { formatTime, formatDate, formatTimeShort, toLocalTime, getActivityStatus, STATUS_TEXT, STATUS_TAG_CLASS } = require('../../utils/util')
 const app = getApp()
 
+// 从微信错误对象中提取可读信息，如 "uploadFile:fail Error: socket hang up" → "socket hang up"
+function errText(e) {
+  const msg = (e && (e.errMsg || e.message)) || ''
+  const m = /Error:\s*(.+)$/.exec(msg)
+  return (m ? m[1] : msg).slice(0, 40) || '未知错误'
+}
+
+// 云函数调用带一次重试：函数超时时间仅 3 秒，冷启动容易超时被杀，
+// 重试时容器已焐热通常能秒回
+async function callFunctionWithRetry(name, data) {
+  try {
+    return await wx.cloud.callFunction({ name, data })
+  } catch (err) {
+    console.error(`callFunction ${name} error, retrying:`, err)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    return wx.cloud.callFunction({ name, data })
+  }
+}
+
 Page({
   data: {
     activity: null,
@@ -38,15 +57,14 @@ Page({
     if (!quiet) wx.showLoading({ title: '加载中' })
 
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getActivityDetail',
-        data: { activityId: this.activityId }
-      })
+      const res = await callFunctionWithRetry('getActivityDetail', { activityId: this.activityId })
 
       const result = res.result
 
       if (!result.success) {
-        wx.showToast({ title: result.error || '加载失败', icon: 'none' })
+        if (!quiet) {
+          wx.showToast({ title: result.error || '加载失败', icon: 'none' })
+        }
         return
       }
 
@@ -78,7 +96,10 @@ Page({
       })
     } catch (err) {
       console.error('loadDetail error:', err)
-      wx.showToast({ title: '加载失败', icon: 'none' })
+      // 静默模式（如上传后刷新）不打扰用户
+      if (!quiet) {
+        wx.showToast({ title: '加载失败', icon: 'none' })
+      }
     } finally {
       if (!quiet) wx.hideLoading()
     }
@@ -206,68 +227,79 @@ Page({
       return uploadRes.fileID
     }
 
-    // 并发上传，单张失败不影响其他照片；失败的自动重试一次
-    let doneCount = 0
-    const results = await Promise.all(tempFiles.map(async (file, i) => {
+    // 串行上传：部分网络环境（代理/VPN）下并发连接会被断开（socket hang up），
+    // 串行最稳定；单张失败自动重试一次，不影响其他照片
+    const results = new Array(tempFiles.length)
+    for (let i = 0; i < tempFiles.length; i++) {
+      wx.showLoading({ title: `上传中 ${i + 1}/${tempFiles.length}` })
       try {
-        const fileID = await uploadOne(file, i)
-        return { fileID }
+        results[i] = { fileID: await uploadOne(tempFiles[i], i) }
       } catch (err) {
         console.error('upload photo error, retrying:', i, err)
         try {
-          const fileID = await uploadOne(file, i)
-          return { fileID }
+          results[i] = { fileID: await uploadOne(tempFiles[i], i) }
         } catch (retryErr) {
           console.error('upload photo retry failed:', i, retryErr)
-          return { error: retryErr }
+          results[i] = { error: retryErr }
         }
-      } finally {
-        doneCount++
-        wx.showLoading({ title: `上传中 ${doneCount}/${tempFiles.length}` })
       }
-    }))
+    }
 
     const fileIDs = results.filter(r => r.fileID).map(r => r.fileID)
     const failCount = results.length - fileIDs.length
+    const firstErr = results.find(r => r.error)
+    const errHint = firstErr ? `：${errText(firstErr.error)}` : ''
 
-    try {
-      if (fileIDs.length > 0) {
-        const addRes = await wx.cloud.callFunction({
-          name: 'addActivityPhotos',
-          data: { activityId: this.activityId, fileIDs }
+    if (fileIDs.length > 0) {
+      // 写库。注意：callFunction 客户端报错（超时/弱网）时，服务端往往已写入完成，
+      // 因此无论成败都要刷新列表，以云端实际数据为准
+      try {
+        const addRes = await callFunctionWithRetry('addActivityPhotos', {
+          activityId: this.activityId,
+          fileIDs
         })
 
         if (!addRes.result.success) {
           wx.hideLoading()
           wx.showToast({ title: addRes.result.error || '上传失败', icon: 'none' })
+          this.setData({ uploading: false })
+          this.loadDetail(true)
           return
         }
-      }
-
-      wx.hideLoading()
-      if (failCount === 0) {
-        wx.showToast({ title: '上传成功', icon: 'success' })
-      } else if (fileIDs.length > 0) {
-        wx.showModal({
-          title: '部分照片上传失败',
-          content: `成功 ${fileIDs.length} 张，失败 ${failCount} 张，可重新选择失败的照片再次上传`,
-          showCancel: false,
-          confirmText: '知道了'
-        })
-      } else {
-        wx.showToast({ title: '上传失败，请重试', icon: 'none' })
-      }
-
-      if (fileIDs.length > 0) {
+      } catch (err) {
+        console.error('addActivityPhotos error:', err)
+        wx.hideLoading()
+        wx.showToast({ title: '网络较慢，正在确认上传结果…', icon: 'none' })
+        this.setData({ uploading: false })
         this.loadDetail(true)
+        return
       }
-    } catch (err) {
-      console.error('choosePhotos error:', err)
-      wx.hideLoading()
-      wx.showToast({ title: '上传失败', icon: 'none' })
-    } finally {
-      this.setData({ uploading: false })
     }
+
+    if (fileIDs.length > 0) {
+      // 乐观更新：先把刚上传的照片插到网格里，不必等整页重新加载
+      const newPhotos = fileIDs.map(fileID => ({ fileID, uploader: openid }))
+      this.setData({ photos: [...this.data.photos, ...newPhotos] })
+    }
+
+    wx.hideLoading()
+    if (failCount === 0 && fileIDs.length > 0) {
+      wx.showToast({ title: '上传成功', icon: 'success' })
+    } else if (fileIDs.length > 0) {
+      wx.showModal({
+        title: '部分照片上传失败',
+        content: `成功 ${fileIDs.length} 张，失败 ${failCount} 张${errHint}，可重新选择失败的照片再次上传`,
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    } else {
+      wx.showToast({ title: `上传失败，请重试${errHint}`, icon: 'none' })
+    }
+
+    if (fileIDs.length > 0) {
+      this.loadDetail(true)
+    }
+    this.setData({ uploading: false })
   },
 
   previewPhoto(e) {
