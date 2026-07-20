@@ -81,6 +81,13 @@ tcb config update fn <fnName> --timeout 20 -e cloud1-d7gakdyxk317f169d
 
 新建云函数后记得同样把超时改为 20 秒。客户端对关键调用（`addActivityPhotos`、`getActivityDetail`）另加了一次自动重试兜底。
 
+**云存储权限**：必须保持为**"所有用户可读，仅创建者可写"（READONLY）**——照片/头像 fileID 由客户端 `<image>` 直接渲染，若误设为"仅创建者可读写"（PRIVATE），其他用户全部加载失败而管理员自查无感。曾因此导致发布后用户反馈照片打不开。查看/调整：
+
+```sh
+tcb storage get-acl -e cloud1-d7gakdyxk317f169d
+tcb storage set-acl --acl READONLY -e cloud1-d7gakdyxk317f169d
+```
+
 发布通过开发者工具的"上传/预览"流程进行，无 CI/CD。
 
 ## 测试
